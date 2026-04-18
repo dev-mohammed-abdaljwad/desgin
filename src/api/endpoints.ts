@@ -54,6 +54,19 @@ export const PUBLIC_ENDPOINTS = {
     PRODUCT_INQUIRIES: '/product-inquiries',
   },
 
+  // Testimonials
+  TESTIMONIALS: {
+    LIST: '/testimonials',
+    DETAIL: (id: number) => `/testimonials/${id}`,
+    FEATURED: '/testimonials/featured',
+  },
+
+  // Why Choose Us
+  WHY_CHOOSE_US: {
+    LIST: '/why-choose-us',
+    DETAIL: (id: number) => `/why-choose-us/${id}`,
+  },
+
   // Settings (Public)
   SETTINGS: {
     DESIGN_SYSTEM: '/settings/design-system',

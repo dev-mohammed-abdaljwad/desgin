@@ -4,9 +4,9 @@
  */
 
 import { useCallback } from 'react';
-import { pagesService, servicesService, postsService, productsService, projectsService, settingsService } from '../api/services/public';
+import { pagesService, servicesService, postsService, productsService, projectsService, testimonialsService, whyChooseUsService, settingsService } from '../api/services/public';
 import { usePaginatedApi, useApi, useLazyApi } from './useApi';
-import type { Page, Service, Post, Product, Project, DesignSystemSettings } from '../types/api';
+import type { Page, Service, Post, Product, Project, Testimonial, WhyChooseUs, DesignSystemSettings } from '../types/api';
 
 // ============= Pages Hooks =============
 
@@ -172,6 +172,49 @@ export function useSearchProjects(query: string) {
   return useApi(
     () => projectsService.searchProjects(query),
     [query]
+  );
+}
+
+// ============= Testimonials Hooks =============
+
+export function useTestimonials(page: number = 1, perPage: number = 15) {
+  return usePaginatedApi(
+    (p, pp) => testimonialsService.getTestimonials(p, pp),
+    page,
+    perPage,
+    []
+  );
+}
+
+export function useFeaturedTestimonials(limit: number = 6) {
+  return useApi(
+    () => testimonialsService.getFeaturedTestimonials(limit),
+    [limit]
+  );
+}
+
+export function useTestimonial(id: number) {
+  return useApi(
+    () => testimonialsService.getTestimonial(id),
+    [id]
+  );
+}
+
+// ============= Why Choose Us Hooks =============
+
+export function useWhyChooseUs(page: number = 1, perPage: number = 15) {
+  return usePaginatedApi(
+    (p, pp) => whyChooseUsService.getWhyChooseUs(p, pp),
+    page,
+    perPage,
+    []
+  );
+}
+
+export function useWhyChooseUsItem(id: number) {
+  return useApi(
+    () => whyChooseUsService.getWhyChooseUsItem(id),
+    [id]
   );
 }
 

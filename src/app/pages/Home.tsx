@@ -6,7 +6,8 @@ import { TestimonialCard } from '../components/ui/TestimonialCard';
 import { PortfolioCard } from '../components/ui/PortfolioCard';
 import { BlogCard } from '../components/ui/BlogCard';
 import { StatsCard } from '../components/ui/StatsCard';
-import { useServices, useFeaturedProjects, usePosts, usePageBySlug } from '../../hooks/usePublicApi';
+import { useServices, useFeaturedProjects, usePosts, usePageBySlug, useFeaturedTestimonials, useWhyChooseUs } from '../../hooks/usePublicApi';
+import type { LucideIcon } from 'lucide-react';
 import {
   Megaphone,
   Video,
@@ -24,7 +25,54 @@ import {
   Target,
   Zap,
   Shield,
+  DollarSign,
+  Headphones,
+  RefreshCw,
 } from 'lucide-react';
+import type { Service, Project, Post, Testimonial, WhyChooseUs } from '../../types/api';
+
+// ============= Icon Mapping =============
+const categoryIconMap: Record<string, LucideIcon> = {
+  marketing: Megaphone,
+  'social-media': Share2,
+  design: Palette,
+  'video-production': Video,
+  podcast: Mic,
+  education: GraduationCap,
+  photography: Camera,
+  ads: TrendingUp,
+};
+
+// Icon names mapping for Why Choose Us items
+const iconNameMap: Record<string, LucideIcon> = {
+  Target: Target,
+  Shield: Shield,
+  Zap: Zap,
+  DollarSign: DollarSign,
+  Headphones: Headphones,
+  RefreshCw: RefreshCw,
+};
+
+// ============= Utility Functions =============
+function getIconForCategory(category: string): LucideIcon {
+  return categoryIconMap[category] || Megaphone;
+}
+
+function calculateReadTime(content: string): string {
+  const wordsPerMinute = 200;
+  const wordCount = content.split(/\s+/).length;
+  const readTimeMinutes = Math.ceil(wordCount / wordsPerMinute);
+  return `${readTimeMinutes} min read`;
+}
+
+function formatDate(dateString: string): string {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', { 
+    year: 'numeric', 
+    month: 'short', 
+    day: 'numeric' 
+  });
+}
 
 export function Home() {
   const { t, dir, language } = useLanguage();
@@ -33,90 +81,41 @@ export function Home() {
   const { data: fetchedServices, loading: servicesLoading } = useServices(1, 100);
   const { data: projects, loading: projectsLoading } = useFeaturedProjects();
   const { data: posts, loading: postsLoading } = usePosts(1, 10);
+  const { data: testimonialsList, loading: testimonialsLoading } = useFeaturedTestimonials(6);
+  const { data: whyChooseUsList, loading: whyChooseUsLoading } = useWhyChooseUs(1, 10);
   const { data: homepage, loading: homeLoading } = usePageBySlug('homepage');
 
-  const services = [
-    {
-      icon: Megaphone,
-      title: t('Branding & Marketing', 'العلامة التجارية والتسويق'),
-      description: t(
-        'Build a powerful brand identity and reach your target audience with strategic marketing campaigns.',
-        'بناء هوية تجارية قوية والوصول إلى جمهورك المستهدف من خلال حملات تسويقية استراتيجية.'
-      ),
-      link: '/services#marketing',
-      gradient: 'from-primary to-accent',
-    },
-    {
-      icon: Share2,
-      title: t('Social Media Management', 'إدارة وسائل التواصل الاجتماعي'),
-      description: t(
-        'Engage your audience with compelling content and data-driven social media strategies.',
-        'تفاعل مع جمهورك من خلال محتوى مقنع واستراتيجيات وسائل التواصل الاجتماعي القائمة على البيانات.'
-      ),
-      link: '/services#marketing',
-      gradient: 'from-accent to-secondary',
-    },
-    {
-      icon: Palette,
-      title: t('Graphic Design', 'التصميم الجرافيكي'),
-      description: t(
-        'Creative visual designs that capture attention and communicate your message effectively.',
-        'تصاميم بصرية إبداعية تجذب الانتباه وتوصل رسالتك بفعالية.'
-      ),
-      link: '/services#media',
-      gradient: 'from-secondary to-gold',
-    },
-    {
-      icon: Video,
-      title: t('Video Production', 'إنتاج الفيديو'),
-      description: t(
-        'Professional video content from concept to final edit, including commercials and social media content.',
-        'محتوى فيديو احترافي من الفكرة إلى المونتاج النهائي، بما في ذلك الإعلانات ومحتوى وسائل التواصل.'
-      ),
-      link: '/services#media',
-      gradient: 'from-primary to-secondary',
-    },
-    {
-      icon: Mic,
-      title: t('Podcast Production', 'إنتاج البودكاست'),
-      description: t(
-        'Full-service podcast studio with professional equipment, recording, editing, and distribution.',
-        'استوديو بودكاست متكامل مع معدات احترافية وتسجيل ومونتاج ونشر.'
-      ),
-      link: '/podcast-studio',
-      gradient: 'from-accent to-primary',
-    },
-    {
-      icon: GraduationCap,
-      title: t('Educational Platform', 'المنصة التعليمية'),
-      description: t(
-        'Online learning platform connecting students with quality educational content from expert teachers.',
-        'منصة تعليمية إلكترونية تربط الطلاب بمحتوى تعليمي عالي الجودة من معلمين خبراء.'
-      ),
-      link: '/educational-platform',
-      gradient: 'from-secondary to-accent',
-    },
-    {
-      icon: Camera,
-      title: t('Photography', 'التصوير الفوتوغرافي'),
-      description: t(
-        'Professional photography services for products, events, and corporate needs.',
-        'خدمات تصوير احترافي للمنتجات والفعاليات والاحتياجات المؤسسية.'
-      ),
-      link: '/services#media',
-      gradient: 'from-gold to-primary',
-    },
-    {
-      icon: TrendingUp,
-      title: t('Ads Campaigns', 'الحملات الإعلانية'),
-      description: t(
-        'Data-driven advertising campaigns across digital platforms to maximize ROI.',
-        'حملات إعلانية قائمة على البيانات عبر المنصات الرقمية لزيادة عائد الاستثمار.'
-      ),
-      link: '/services#marketing',
-      gradient: 'from-accent to-gold',
-    },
-  ];
+  // Map API services to ServiceCard props
+  const services = ((fetchedServices as Service[]) || []).map((service: Service) => ({
+    icon: getIconForCategory(service.category),
+    title: language === 'en' ? service.title.en : service.title.ar,
+    description: language === 'en' ? service.description.en : service.description.ar,
+    link: `/services/${service.id}`,
+    gradient: categoryIconMap[service.category] ? 'from-primary to-accent' : 'from-secondary to-gold',
+  }));
+
+  // Map API projects to PortfolioCard props
+  const portfolioItems = ((projects as Project[]) || []).map((project: Project) => ({
+    title: language === 'en' ? project.title.en : project.title.ar,
+    category: project.category,
+    description: language === 'en' ? project.description.en : project.description.ar,
+    image: project.images?.[0] || 'https://images.unsplash.com/photo-1634942537034-2531766767d1?w=800&q=80',
+    tags: [],
+    link: project.website_url,
+  }));
+
+  // Map API posts to BlogCard props
+  const blogPosts = ((posts as Post[]) || [])
+    .filter((post: Post) => post.type === 'blog')
+    .map((post: Post) => ({
+      title: language === 'en' ? post.title.en : post.title.ar,
+      excerpt: language === 'en' ? post.excerpt.en : post.excerpt.ar,
+      image: post.featured_image || post.thumbnail || 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80',
+      category: language === 'en' ? 'Blog' : 'مدونة',
+      date: formatDate(post.published_at),
+      readTime: calculateReadTime(language === 'en' ? post.content.en : post.content.ar),
+      slug: post.slug,
+    }));
 
   const stats = [
     {
@@ -145,137 +144,23 @@ export function Home() {
     },
   ];
 
-  const whyChooseUs = [
-    {
-      icon: Target,
-      title: t('All-in-One Solution', 'حل شامل متكامل'),
-      description: t(
-        'From marketing to education, we provide everything you need under one roof.',
-        'من التسويق إلى التعليم، نوفر كل ما تحتاجه تحت سقف واحد.'
-      ),
-    },
-    {
-      icon: Shield,
-      title: t('Professional Team', 'فريق محترف'),
-      description: t(
-        'Expert team of designers, marketers, and educators dedicated to your success.',
-        'فريق خبراء من المصممين والمسوقين والمعلمين مكرسون لنجاحك.'
-      ),
-    },
-    {
-      icon: Zap,
-      title: t('Fast Delivery', 'تسليم سريع'),
-      description: t(
-        'Quick turnaround times without compromising on quality.',
-        'أوقات تسليم سريعة دون المساس بالجودة.'
-      ),
-    },
-  ];
+  // Map API why-choose-us items to component props
+  const whyChooseUs = ((whyChooseUsList as WhyChooseUs[]) || [])
+    .sort((a, b) => a.order - b.order)
+    .map((item: WhyChooseUs) => ({
+      icon: iconNameMap[item.icon] || Target,
+      title: language === 'en' ? item.title.en : item.title.ar,
+      description: language === 'en' ? item.description.en : item.description.ar,
+    }));
 
-  const testimonials = [
-    {
-      name: t('Ahmed Al-Rashid', 'أحمد الراشد'),
-      role: t('CEO', 'المدير التنفيذي'),
-      company: t('Tech Startup', 'شركة تقنية ناشئة'),
-      content: t(
-        'MediaPro transformed our brand presence completely. Their marketing strategies delivered results beyond our expectations.',
-        'ميديا برو حولت حضور علامتنا التجارية بشكل كامل. استراتيجياتهم التسويقية حققت نتائج فاقت توقعاتنا.'
-      ),
-      rating: 5,
-    },
-    {
-      name: t('Sara Mohammed', 'سارة محمد'),
-      role: t('Teacher', 'معلمة'),
-      company: t('High School', 'مدرسة ثانوية'),
-      content: t(
-        'The educational platform helped me reach hundreds of students. The studio quality is exceptional for recording lessons.',
-        'المنصة التعليمية ساعدتني في الوصول إلى مئات الطلاب. جودة الاستوديو استثنائية لتسجيل الدروس.'
-      ),
-      rating: 5,
-    },
-    {
-      name: t('Khaled Ibrahim', 'خالد إبراهيم'),
-      role: t('Podcast Host', 'مقدم بودكاست'),
-      company: t('Tech Talk Podcast', 'بودكاست حديث تقني'),
-      content: t(
-        'Their podcast studio is top-notch! Professional equipment and excellent post-production support.',
-        'استوديو البودكاست لديهم من الدرجة الأولى! معدات احترافية ودعم ممتاز لما بعد الإنتاج.'
-      ),
-      rating: 5,
-    },
-  ];
-
-  const portfolioItems = [
-    {
-      title: t('Brand Identity Design', 'تصميم هوية العلامة التجارية'),
-      category: t('Branding', 'العلامة التجارية'),
-      description: t(
-        'Complete brand identity package for a luxury retail brand.',
-        'حزمة هوية تجارية كاملة لعلامة تجارية فاخرة للبيع بالتجزئة.'
-      ),
-      image: 'https://images.unsplash.com/photo-1634942537034-2531766767d1?w=800&q=80',
-      tags: [t('Logo', 'شعار'), t('Branding', 'هوية'), t('Print', 'طباعة')],
-    },
-    {
-      title: t('Social Media Campaign', 'حملة وسائل التواصل الاجتماعي'),
-      category: t('Marketing', 'التسويق'),
-      description: t(
-        'Multi-platform campaign that generated 500% increase in engagement.',
-        'حملة متعددة المنصات حققت زيادة 500٪ في التفاعل.'
-      ),
-      image: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800&q=80',
-      tags: [t('Social Media', 'سوشيال ميديا'), t('Content', 'محتوى'), t('Ads', 'إعلانات')],
-    },
-    {
-      title: t('Corporate Video', 'فيديو مؤسسي'),
-      category: t('Video Production', 'إنتاج الفيديو'),
-      description: t(
-        'High-quality corporate video showcasing company values and culture.',
-        'فيديو مؤسسي عالي الجودة يعرض قيم وثقافة الشركة.'
-      ),
-      image: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=800&q=80',
-      tags: [t('Video', 'فيديو'), t('Corporate', 'مؤسسي'), t('Storytelling', 'سرد قصصي')],
-    },
-  ];
-
-  const blogPosts = [
-    {
-      title: t('10 Marketing Trends for 2026', '10 اتجاهات تسويقية لعام 2026'),
-      excerpt: t(
-        'Stay ahead of the curve with these emerging marketing trends that will shape the industry.',
-        'ابق في الطليعة مع هذه الاتجاهات التسويقية الناشئة التي ستشكل الصناعة.'
-      ),
-      image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80',
-      category: t('Marketing', 'التسويق'),
-      date: t('Apr 10, 2026', '10 أبريل 2026'),
-      readTime: t('5 min read', '5 دقائق'),
-      slug: 'marketing-trends-2026',
-    },
-    {
-      title: t('How to Start Your Own Podcast', 'كيف تبدأ البودكاست الخاص بك'),
-      excerpt: t(
-        'Complete guide to launching a successful podcast, from equipment to distribution.',
-        'دليل كامل لإطلاق بودكاست ناجح، من المعدات إلى التوزيع.'
-      ),
-      image: 'https://images.unsplash.com/photo-1590602847861-f357a9332bbc?w=800&q=80',
-      category: t('Podcast', 'بودكاست'),
-      date: t('Apr 8, 2026', '8 أبريل 2026'),
-      readTime: t('7 min read', '7 دقائق'),
-      slug: 'start-podcast-guide',
-    },
-    {
-      title: t('Online Learning: The Future of Education', 'التعلم الإلكتروني: مستقبل التعليم'),
-      excerpt: t(
-        'Discover how online platforms are revolutionizing education for students and teachers.',
-        'اكتشف كيف تُحدث المنصات الإلكترونية ثورة في التعليم للطلاب والمعلمين.'
-      ),
-      image: 'https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=800&q=80',
-      category: t('Education', 'التعليم'),
-      date: t('Apr 5, 2026', '5 أبريل 2026'),
-      readTime: t('6 min read', '6 دقائق'),
-      slug: 'online-learning-future',
-    },
-  ];
+  const testimonials = ((testimonialsList as Testimonial[]) || []).map((testimonial: Testimonial) => ({
+    name: language === 'en' ? testimonial.name.en : testimonial.name.ar,
+    role: language === 'en' ? testimonial.role.en : testimonial.role.ar,
+    company: language === 'en' ? (testimonial.company?.en ?? '') : (testimonial.company?.ar ?? ''),
+    content: language === 'en' ? testimonial.content.en : testimonial.content.ar,
+    rating: testimonial.rating,
+    image: testimonial.avatar,
+  }));
 
   return (
     <div className="pt-20 lg:pt-20">

@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router";
 import { RootLayout } from "./components/layout/RootLayout";
 import { Home } from "./pages/Home";
 import { Services } from "./pages/Services";
+import { ServiceDetail } from "./pages/ServiceDetail";
 import { PodcastStudio } from "./pages/PodcastStudio";
 import { EducationalPlatform } from "./pages/EducationalPlatform";
 import { Offers } from "./pages/Offers";
@@ -28,6 +29,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, Component: Home },
       { path: "services", Component: Services },
+      { path: "services/:id", Component: ServiceDetail },
       { path: "podcast-studio", Component: PodcastStudio },
       { path: "educational-platform", Component: EducationalPlatform },
       { path: "offers", Component: Offers },

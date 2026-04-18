@@ -2,6 +2,9 @@ import { useLanguage } from '../context/LanguageContext';
 import { motion } from 'motion/react';
 import { ServiceCard } from '../components/ui/ServiceCard';
 import { FAQ } from '../components/ui/FAQ';
+import { useServicesByCategory } from '../../hooks/usePublicApi';
+import type { Service } from '../../types/api';
+import type { LucideIcon } from 'lucide-react';
 import {
   Megaphone,
   Target,
@@ -24,172 +27,45 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router';
 
+// ============= Icon Mapping =============
+const categoryIconMap: Record<string, LucideIcon> = {
+  marketing: Megaphone,
+  'social-media': Share2,
+  design: Palette,
+  'video-production': Video,
+  podcast: Mic,
+  education: GraduationCap,
+  photography: Camera,
+  ads: TrendingUp,
+};
+
+function getIconForCategory(category: string): LucideIcon {
+  return categoryIconMap[category] || Megaphone;
+}
+
 export function Services() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  
+  // Fetch services by category from API
+  const { data: marketingData, loading: marketingLoading } = useServicesByCategory('marketing');
+  const { data: mediaData, loading: mediaLoading } = useServicesByCategory('media');
+  const { data: podcastData, loading: podcastLoading } = useServicesByCategory('podcast');
+  const { data: educationData, loading: educationLoading } = useServicesByCategory('education');
 
-  const marketingServices = [
-    {
-      icon: Megaphone,
-      title: t('Branding & Identity', 'العلامة التجارية والهوية'),
-      description: t(
-        'Create a memorable brand identity that resonates with your target audience.',
-        'أنشئ هوية تجارية لا تُنسى تتناسب مع جمهورك المستهدف.'
-      ),
+  // Map API services to ServiceCard props
+  const mapAPIServices = (services: Service[]) => 
+    (services || []).map((service: Service) => ({
+      icon: getIconForCategory(service.category),
+      title: language === 'en' ? service.title.en : service.title.ar,
+      description: language === 'en' ? service.description.en : service.description.ar,
+      link: `/services/${service.id}`,
       gradient: 'from-primary to-accent',
-    },
-    {
-      icon: Target,
-      title: t('Digital Marketing Strategy', 'استراتيجية التسويق الرقمي'),
-      description: t(
-        'Data-driven marketing strategies tailored to your business goals.',
-        'استراتيجيات تسويقية قائمة على البيانات ومصممة خصيصاً لأهداف عملك.'
-      ),
-      gradient: 'from-accent to-secondary',
-    },
-    {
-      icon: TrendingUp,
-      title: t('SEO & SEM', 'تحسين محركات البحث والتسويق عبر محركات البحث'),
-      description: t(
-        'Improve your online visibility and drive qualified traffic to your website.',
-        'حسّن ظهورك على الإنترنت واجذب زوار مؤهلين إلى موقعك.'
-      ),
-      gradient: 'from-secondary to-gold',
-    },
-    {
-      icon: Share2,
-      title: t('Social Media Management', 'إدارة وسائل التواصل الاجتماعي'),
-      description: t(
-        'Engage your audience with compelling content across all social platforms.',
-        'تفاعل مع جمهورك بمحتوى مقنع عبر جميع منصات التواصل الاجتماعي.'
-      ),
-      gradient: 'from-primary to-secondary',
-    },
-  ];
+    }));
 
-  const mediaServices = [
-    {
-      icon: Palette,
-      title: t('Graphic Design', 'التصميم الجرافيكي'),
-      description: t(
-        'Eye-catching designs for print and digital media that communicate your message.',
-        'تصاميم جذابة للطباعة والوسائط الرقمية توصل رسالتك.'
-      ),
-      gradient: 'from-accent to-primary',
-    },
-    {
-      icon: Video,
-      title: t('Video Production', 'إنتاج الفيديو'),
-      description: t(
-        'Professional video production from concept to final edit.',
-        'إنتاج فيديو احترافي من الفكرة إلى المونتاج النهائي.'
-      ),
-      gradient: 'from-secondary to-accent',
-    },
-    {
-      icon: Camera,
-      title: t('Photography', 'التصوير الفوتوغرافي'),
-      description: t(
-        'High-quality product, event, and corporate photography services.',
-        'خدمات تصوير احترافية للمنتجات والفعاليات والشركات.'
-      ),
-      gradient: 'from-gold to-primary',
-    },
-    {
-      icon: Wand2,
-      title: t('Motion Graphics', 'الرسوم المتحركة'),
-      description: t(
-        'Engaging animated content that brings your ideas to life.',
-        'محتوى متحرك جذاب يحيي أفكارك.'
-      ),
-      gradient: 'from-primary to-gold',
-    },
-  ];
-
-  const podcastServices = [
-    {
-      icon: Mic,
-      title: t('Studio Recording', 'التسجيل في الاستوديو'),
-      description: t(
-        'Professional podcast studio with state-of-the-art equipment.',
-        'استوديو بودكاست احترافي مع أحدث المعدات.'
-      ),
-      gradient: 'from-accent to-secondary',
-      link: '/podcast-studio',
-    },
-    {
-      icon: Headphones,
-      title: t('Audio Editing', 'تحرير الصوت'),
-      description: t(
-        'Expert audio editing and mastering for crystal-clear sound.',
-        'تحرير صوت وماسترينج احترافي لصوت نقي.'
-      ),
-      gradient: 'from-secondary to-primary',
-      link: '/podcast-studio',
-    },
-    {
-      icon: Radio,
-      title: t('Podcast Distribution', 'توزيع البودكاست'),
-      description: t(
-        'Get your podcast on all major platforms with our distribution service.',
-        'انشر بودكاستك على جميع المنصات الرئيسية مع خدمة التوزيع لدينا.'
-      ),
-      gradient: 'from-primary to-accent',
-      link: '/podcast-studio',
-    },
-    {
-      icon: Film,
-      title: t('Video Podcast', 'بودكاست فيديو'),
-      description: t(
-        'Multi-camera video podcast recording and production.',
-        'تسجيل وإنتاج بودكاست فيديو بكاميرات متعددة.'
-      ),
-      gradient: 'from-gold to-accent',
-      link: '/podcast-studio',
-    },
-  ];
-
-  const educationServices = [
-    {
-      icon: GraduationCap,
-      title: t('For Students', 'للطلاب'),
-      description: t(
-        'Access high-quality educational content from expert teachers.',
-        'احصل على محتوى تعليمي عالي الجودة من معلمين خبراء.'
-      ),
-      gradient: 'from-primary to-secondary',
-      link: '/educational-platform',
-    },
-    {
-      icon: BookOpen,
-      title: t('For Teachers', 'للمعلمين'),
-      description: t(
-        'Record and upload your lessons, reach thousands of students.',
-        'سجّل ونشر دروسك، واصل آلاف الطلاب.'
-      ),
-      gradient: 'from-accent to-gold',
-      link: '/educational-platform',
-    },
-    {
-      icon: Users,
-      title: t('Course Management', 'إدارة الدورات'),
-      description: t(
-        'Complete learning management system for organizing courses.',
-        'نظام إدارة تعلم كامل لتنظيم الدورات.'
-      ),
-      gradient: 'from-secondary to-primary',
-      link: '/educational-platform',
-    },
-    {
-      icon: Award,
-      title: t('Certification', 'الشهادات'),
-      description: t(
-        'Issue certificates to students upon course completion.',
-        'إصدار شهادات للطلاب عند إكمال الدورة.'
-      ),
-      gradient: 'from-gold to-accent',
-      link: '/educational-platform',
-    },
-  ];
+  const marketingServices = mapAPIServices((marketingData as Service[]) || []);
+  const mediaServices = mapAPIServices((mediaData as Service[]) || []);
+  const podcastServices = mapAPIServices((podcastData as Service[]) || []);
+  const educationServices = mapAPIServices((educationData as Service[]) || []);
 
   const faqItems = [
     {

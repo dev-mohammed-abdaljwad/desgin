@@ -62,10 +62,8 @@ export interface AuthState {
 export interface Page {
   id: number;
   slug: string;
-  title_ar: string;
-  title_en: string;
-  content_ar: string;
-  content_en: string;
+  title: BilingualText;
+  content: BilingualText;
   meta_title: string;
   meta_description: string;
   featured_image: string;
@@ -91,16 +89,21 @@ export interface UpdatePageRequest extends Partial<CreatePageRequest> {}
 
 // ============= Services Types =============
 
+export type ServiceCategory = 'marketing' | 'media' | 'podcast' | 'education' | 'design' | 'photography' | 'ads' | 'social-media' | 'video-production';
+
+export interface BilingualText {
+  ar: string;
+  en: string;
+}
+
 export interface Service {
   id: number;
-  title_ar: string;
-  title_en: string;
-  description_ar: string;
-  description_en: string;
-  category: 'marketing' | 'media' | 'podcast' | 'education';
+  title: BilingualText;
+  description: BilingualText;
+  category: ServiceCategory;
   image: string;
   icon: string;
-  price: number;
+  price: string | number;
   is_active: boolean;
   order: number;
   created_at: string;
@@ -128,12 +131,9 @@ export type PostType = 'blog' | 'reel' | 'news';
 
 export interface Post {
   id: number;
-  title_ar: string;
-  title_en: string;
-  content_ar: string;
-  content_en: string;
-  excerpt_ar: string;
-  excerpt_en: string;
+  title: BilingualText;
+  content: BilingualText;
+  excerpt: BilingualText;
   type: PostType;
   category_id: number;
   slug: string;
@@ -151,10 +151,8 @@ export interface Post {
 
 export interface Category {
   id: number;
-  name_ar: string;
-  name_en: string;
-  description_ar?: string;
-  description_en?: string;
+  name: BilingualText;
+  description?: BilingualText;
   type: PostType;
   slug: string;
   icon?: string;
@@ -205,12 +203,9 @@ export type ProductType = 'education_platform' | 'subscription' | 'bundle' | 'co
 
 export interface Product {
   id: number;
-  title_ar: string;
-  title_en: string;
-  description_ar: string;
-  description_en: string;
-  benefits_ar: string;
-  benefits_en: string;
+  title: BilingualText;
+  description: BilingualText;
+  benefits: BilingualText;
   type: ProductType;
   price: number;
   discount_price?: number;
@@ -250,14 +245,10 @@ export interface UpdateProductRequest extends Partial<CreateProductRequest> {}
 
 export interface Project {
   id: number;
-  title_ar: string;
-  title_en: string;
-  description_ar: string;
-  description_en: string;
-  challenge_ar: string;
-  challenge_en: string;
-  solution_ar: string;
-  solution_en: string;
+  title: BilingualText;
+  description: BilingualText;
+  challenge: BilingualText;
+  solution: BilingualText;
   category: string;
   client_name: string;
   client_logo: string;
@@ -295,10 +286,8 @@ export interface UpdateProjectRequest extends Partial<CreateProjectRequest> {}
 
 export interface Offer {
   id: number;
-  title_ar: string;
-  title_en: string;
-  description_ar?: string;
-  description_en?: string;
+  title: BilingualText;
+  description?: BilingualText;
   code: string;
   discount_percentage?: number;
   discount_amount?: number;
@@ -456,6 +445,66 @@ export interface MediaFile {
   created_at: string;
   updated_at: string;
 }
+
+// ============= Testimonials Types =============
+
+export interface Testimonial {
+  id: number;
+  name: BilingualText;
+  role: BilingualText;
+  company?: BilingualText;
+  content: BilingualText;
+  rating: number;
+  avatar?: string;
+  is_featured: boolean;
+  is_published: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateTestimonialRequest {
+  name_ar: string;
+  name_en: string;
+  role_ar: string;
+  role_en: string;
+  company_ar?: string;
+  company_en?: string;
+  content_ar: string;
+  content_en: string;
+  rating: number;
+  avatar?: string;
+  is_featured?: boolean;
+  is_published?: boolean;
+}
+
+export interface UpdateTestimonialRequest extends Partial<CreateTestimonialRequest> {}
+
+// ============= Why Choose Us Types =============
+
+export interface WhyChooseUs {
+  id: number;
+  title: BilingualText;
+  description: BilingualText;
+  icon: string;
+  icon_color: string;
+  is_published: boolean;
+  order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateWhyChooseUsRequest {
+  title_ar: string;
+  title_en: string;
+  description_ar: string;
+  description_en: string;
+  icon: string;
+  icon_color?: string;
+  is_published?: boolean;
+  order?: number;
+}
+
+export interface UpdateWhyChooseUsRequest extends Partial<CreateWhyChooseUsRequest> {}
 
 export interface UploadResponse {
   success: boolean;

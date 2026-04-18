@@ -12,6 +12,8 @@ import type {
   Product,
   Project,
   Offer,
+  Testimonial,
+  WhyChooseUs,
   DesignSystemSettings,
   ApiResponse,
   PaginatedResponse,
@@ -74,6 +76,15 @@ class ServicesService {
    */
   async getService(id: number): Promise<ApiResponse<Service>> {
     return this.httpClient.get<ApiResponse<Service>>(PUBLIC_ENDPOINTS.SERVICES.DETAIL(id));
+  }
+
+  /**
+   * Get services by category
+   */
+  async getServicesByCategory(category: string, perPage: number = 15): Promise<PaginatedResponse<Service>> {
+    return this.httpClient.get<PaginatedResponse<Service>>(
+      `${PUBLIC_ENDPOINTS.SERVICES.BY_CATEGORY(category)}?per_page=${perPage}`
+    );
   }
 }
 
@@ -258,10 +269,69 @@ class SettingsService {
   }
 }
 
+class TestimonialsService {
+  private httpClient: HttpClient;
+
+  constructor() {
+    this.httpClient = HttpClient.getInstance();
+  }
+
+  /**
+   * Get all published testimonials
+   */
+  async getTestimonials(page: number = 1, perPage: number = 15): Promise<PaginatedResponse<Testimonial>> {
+    return this.httpClient.get<PaginatedResponse<Testimonial>>(
+      `${PUBLIC_ENDPOINTS.TESTIMONIALS.LIST}?page=${page}&per_page=${perPage}`
+    );
+  }
+
+  /**
+   * Get featured testimonials
+   */
+  async getFeaturedTestimonials(limit: number = 6): Promise<ApiResponse<Testimonial[]>> {
+    return this.httpClient.get<ApiResponse<Testimonial[]>>(
+      `${PUBLIC_ENDPOINTS.TESTIMONIALS.FEATURED}?limit=${limit}`
+    );
+  }
+
+  /**
+   * Get single testimonial by ID
+   */
+  async getTestimonial(id: number): Promise<ApiResponse<Testimonial>> {
+    return this.httpClient.get<ApiResponse<Testimonial>>(PUBLIC_ENDPOINTS.TESTIMONIALS.DETAIL(id));
+  }
+}
+
+class WhyChooseUsService {
+  private httpClient: HttpClient;
+
+  constructor() {
+    this.httpClient = HttpClient.getInstance();
+  }
+
+  /**
+   * Get all why choose us items
+   */
+  async getWhyChooseUs(page: number = 1, perPage: number = 15): Promise<PaginatedResponse<WhyChooseUs>> {
+    return this.httpClient.get<PaginatedResponse<WhyChooseUs>>(
+      `${PUBLIC_ENDPOINTS.WHY_CHOOSE_US.LIST}?page=${page}&per_page=${perPage}`
+    );
+  }
+
+  /**
+   * Get single why choose us item by ID
+   */
+  async getWhyChooseUsItem(id: number): Promise<ApiResponse<WhyChooseUs>> {
+    return this.httpClient.get<ApiResponse<WhyChooseUs>>(PUBLIC_ENDPOINTS.WHY_CHOOSE_US.DETAIL(id));
+  }
+}
+
 // Export service instances
 export const pagesService = new PagesService();
 export const servicesService = new ServicesService();
 export const postsService = new PostsService();
 export const productsService = new ProductsService();
 export const projectsService = new ProjectsService();
+export const testimonialsService = new TestimonialsService();
+export const whyChooseUsService = new WhyChooseUsService();
 export const settingsService = new SettingsService();
