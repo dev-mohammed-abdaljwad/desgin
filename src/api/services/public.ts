@@ -11,15 +11,21 @@ import type {
   Post,
   Product,
   Project,
-  Offer,
   Testimonial,
   WhyChooseUs,
   DesignSystemSettings,
   ApiResponse,
-  PaginatedResponse,  Pricing,} from '../../types/api';
+  PaginatedResponse,
+  Pricing,
+  StudioData,
+  StudioFeature,
+  StudioPackage,
+  StudioWhyUs,
+  StudioFAQ,
+} from '../../types/api';
 
 class PagesService {
-  private httpClient: HttpClient;
+  private readonly httpClient: HttpClient;
 
   constructor() {
     this.httpClient = HttpClient.getInstance();
@@ -43,7 +49,7 @@ class PagesService {
 }
 
 class ServicesService {
-  private httpClient: HttpClient;
+  private readonly httpClient: HttpClient;
 
   constructor() {
     this.httpClient = HttpClient.getInstance();
@@ -77,18 +83,10 @@ class ServicesService {
     return this.httpClient.get<ApiResponse<Service>>(PUBLIC_ENDPOINTS.SERVICES.DETAIL(id));
   }
 
-  /**
-   * Get services by category
-   */
-  async getServicesByCategory(category: string, perPage: number = 15): Promise<PaginatedResponse<Service>> {
-    return this.httpClient.get<PaginatedResponse<Service>>(
-      `${PUBLIC_ENDPOINTS.SERVICES.BY_CATEGORY(category)}?per_page=${perPage}`
-    );
-  }
 }
 
 class PostsService {
-  private httpClient: HttpClient;
+  private readonly httpClient: HttpClient;
 
   constructor() {
     this.httpClient = HttpClient.getInstance();
@@ -149,7 +147,7 @@ class PostsService {
 }
 
 class ProductsService {
-  private httpClient: HttpClient;
+  private readonly httpClient: HttpClient;
 
   constructor() {
     this.httpClient = HttpClient.getInstance();
@@ -196,7 +194,7 @@ class ProductsService {
 }
 
 class ProjectsService {
-  private httpClient: HttpClient;
+  private readonly httpClient: HttpClient;
 
   constructor() {
     this.httpClient = HttpClient.getInstance();
@@ -245,7 +243,7 @@ class ProjectsService {
 }
 
 class SettingsService {
-  private httpClient: HttpClient;
+  private readonly httpClient: HttpClient;
 
   constructor() {
     this.httpClient = HttpClient.getInstance();
@@ -269,7 +267,7 @@ class SettingsService {
 }
 
 class TestimonialsService {
-  private httpClient: HttpClient;
+  private readonly httpClient: HttpClient;
 
   constructor() {
     this.httpClient = HttpClient.getInstance();
@@ -302,7 +300,7 @@ class TestimonialsService {
 }
 
 class WhyChooseUsService {
-  private httpClient: HttpClient;
+  private readonly httpClient: HttpClient;
 
   constructor() {
     this.httpClient = HttpClient.getInstance();
@@ -326,7 +324,7 @@ class WhyChooseUsService {
 }
 
 class PricingsService {
-  private httpClient: HttpClient;
+  private readonly httpClient: HttpClient;
 
   constructor() {
     this.httpClient = HttpClient.getInstance();
@@ -363,6 +361,72 @@ class PricingsService {
   }
 }
 
+class StudioService {
+  private readonly httpClient: HttpClient;
+
+  constructor() {
+    this.httpClient = HttpClient.getInstance();
+  }
+
+  /**
+   * Get all studio data (features, packages, why_us, faq)
+   */
+  async getStudioAll(): Promise<ApiResponse<StudioData>> {
+    return this.httpClient.get<ApiResponse<StudioData>>(PUBLIC_ENDPOINTS.STUDIO.ALL);
+  }
+
+  /**
+   * Get studio features only
+   */
+  async getStudioFeatures(): Promise<ApiResponse<StudioFeature[]>> {
+    return this.httpClient.get<ApiResponse<StudioFeature[]>>(PUBLIC_ENDPOINTS.STUDIO.FEATURES);
+  }
+
+  /**
+   * Get studio packages with pagination
+   */
+  async getStudioPackages(page: number = 1, perPage: number = 15): Promise<PaginatedResponse<StudioPackage>> {
+    return this.httpClient.get<PaginatedResponse<StudioPackage>>(
+      `${PUBLIC_ENDPOINTS.STUDIO.PACKAGES}?page=${page}&per_page=${perPage}`
+    );
+  }
+
+  /**
+   * Get all studio packages (no pagination)
+   */
+  async getAllStudioPackages(): Promise<ApiResponse<StudioPackage[]>> {
+    return this.httpClient.get<ApiResponse<StudioPackage[]>>(PUBLIC_ENDPOINTS.STUDIO.PACKAGES_ALL);
+  }
+
+  /**
+   * Get highlighted studio packages
+   */
+  async getHighlightedStudioPackages(): Promise<ApiResponse<StudioPackage[]>> {
+    return this.httpClient.get<ApiResponse<StudioPackage[]>>(PUBLIC_ENDPOINTS.STUDIO.PACKAGES_HIGHLIGHTED);
+  }
+
+  /**
+   * Get single studio package by ID
+   */
+  async getStudioPackage(id: number): Promise<ApiResponse<StudioPackage>> {
+    return this.httpClient.get<ApiResponse<StudioPackage>>(PUBLIC_ENDPOINTS.STUDIO.PACKAGES_DETAIL(id));
+  }
+
+  /**
+   * Get studio why us items
+   */
+  async getStudioWhyUs(): Promise<ApiResponse<StudioWhyUs[]>> {
+    return this.httpClient.get<ApiResponse<StudioWhyUs[]>>(PUBLIC_ENDPOINTS.STUDIO.WHY_US);
+  }
+
+  /**
+   * Get studio FAQ items
+   */
+  async getStudioFAQ(): Promise<ApiResponse<StudioFAQ[]>> {
+    return this.httpClient.get<ApiResponse<StudioFAQ[]>>(PUBLIC_ENDPOINTS.STUDIO.FAQ);
+  }
+}
+
 // Export service instances
 export const pagesService = new PagesService();
 export const servicesService = new ServicesService();
@@ -373,3 +437,4 @@ export const testimonialsService = new TestimonialsService();
 export const whyChooseUsService = new WhyChooseUsService();
 export const settingsService = new SettingsService();
 export const pricingsService = new PricingsService();
+export const studioService = new StudioService();

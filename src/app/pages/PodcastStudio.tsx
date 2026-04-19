@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { PricingCard } from '../components/ui/PricingCard';
 import { ServiceCard } from '../components/ui/ServiceCard';
 import { FAQ } from '../components/ui/FAQ';
+import type { LucideIcon } from 'lucide-react';
 import {
   Mic,
   Headphones,
@@ -18,182 +19,67 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { Link } from 'react-router';
+import { useStudioAll } from '../../hooks/usePublicApi';
+import type { StudioData, StudioFeature, StudioWhyUs } from '../../types/api';
+
+// Icon mapping utility
+const iconMap: Record<string, LucideIcon> = {
+  Mic,
+  Camera,
+  Headphones,
+  Users,
+  Video,
+  Radio,
+  Zap,
+  Shield,
+  Award,
+  Clock,
+  CheckCircle,
+};
+
+const getIcon = (iconName: string): LucideIcon => iconMap[iconName] || Mic;
 
 export function PodcastStudio() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const { data: studioData } = useStudioAll();
 
-  const features = [
-    {
-      icon: Mic,
-      title: t('Professional Equipment', 'معدات احترافية'),
-      description: t(
-        'State-of-the-art microphones, mixers, and recording equipment.',
-        'ميكروفونات ومكسرات ومعدات تسجيل على أحدث طراز.'
-      ),
-      gradient: 'from-primary to-accent',
-    },
-    {
-      icon: Camera,
-      title: t('Multi-Camera Setup', 'إعداد متعدد الكاميرات'),
-      description: t(
-        'Professional video recording with multiple camera angles.',
-        'تسجيل فيديو احترافي بزوايا كاميرا متعددة.'
-      ),
-      gradient: 'from-accent to-secondary',
-    },
-    {
-      icon: Headphones,
-      title: t('Soundproof Rooms', 'غرف عازلة للصوت'),
-      description: t(
-        'Acoustically treated rooms for crystal-clear audio quality.',
-        'غرف معالجة صوتياً لجودة صوت نقية.'
-      ),
-      gradient: 'from-secondary to-gold',
-    },
-    {
-      icon: Users,
-      title: t('Expert Team', 'فريق خبراء'),
-      description: t(
-        'Professional sound engineers and producers to assist you.',
-        'مهندسو صوت ومنتجون محترفون لمساعدتك.'
-      ),
-      gradient: 'from-gold to-primary',
-    },
-    {
-      icon: Video,
-      title: t('Video Editing', 'مونتاج الفيديو'),
-      description: t(
-        'Professional video editing and post-production services.',
-        'خدمات مونتاج فيديو وما بعد الإنتاج الاحترافية.'
-      ),
-      gradient: 'from-primary to-secondary',
-    },
-    {
-      icon: Radio,
-      title: t('Distribution Support', 'دعم التوزيع'),
-      description: t(
-        'Help publishing your podcast to all major platforms.',
-        'المساعدة في نشر بودكاستك على جميع المنصات الرئيسية.'
-      ),
-      gradient: 'from-accent to-gold',
-    },
-  ];
+  // Map API features to component format
+  const features = ((studioData as StudioData)?.features || []).map((f: StudioFeature) => ({
+    icon: getIcon(f.icon),
+    title: language === 'en' ? f.title_en : f.title_ar,
+    description: language === 'en' ? f.description_en : f.description_ar,
+    gradient: f.gradient,
+  }));
 
-  const packages = [
-    {
-      title: t('Hourly', 'بالساعة'),
-      price: '500',
-      period: t('hour', 'ساعة'),
-      description: t('Perfect for short recordings', 'مثالي للتسجيلات القصيرة'),
-      features: [
-        t('1 hour studio time', 'ساعة واحدة في الاستوديو'),
-        t('Professional microphones', 'ميكروفونات احترافية'),
-        t('Sound engineer included', 'مهندس صوت متضمن'),
-        t('Basic audio editing', 'تحرير صوت أساسي'),
-        t('Complimentary refreshments', 'مرطبات مجانية'),
-      ],
-      highlighted: false,
-      ctaText: t('Book Now', 'احجز الآن'),
-    },
-    {
-      title: t('Half Day', 'نصف يوم'),
-      price: '1,800',
-      period: t('4 hours', '4 ساعات'),
-      description: t('Great for episode recording', 'رائع لتسجيل الحلقات'),
-      features: [
-        t('4 hours studio time', '4 ساعات في الاستوديو'),
-        t('Multi-camera video setup', 'إعداد فيديو متعدد الكاميرات'),
-        t('Dedicated sound engineer', 'مهندس صوت مخصص'),
-        t('Advanced audio editing', 'تحرير صوت متقدم'),
-        t('Video editing (1 hour)', 'مونتاج فيديو (ساعة واحدة)'),
-        t('Catering available', 'خدمة الطعام متاحة'),
-      ],
-      highlighted: true,
-      ctaText: t('Book Now', 'احجز الآن'),
-    },
-    {
-      title: t('Full Day', 'يوم كامل'),
-      price: '3,200',
-      period: t('8 hours', '8 ساعات'),
-      description: t('Best value for multiple episodes', 'أفضل قيمة لحلقات متعددة'),
-      features: [
-        t('8 hours studio time', '8 ساعات في الاستوديو'),
-        t('Premium equipment access', 'الوصول إلى المعدات المتميزة'),
-        t('Full production team', 'فريق إنتاج كامل'),
-        t('Professional editing & mastering', 'تحرير وماسترينج احترافي'),
-        t('Video editing (3 hours)', 'مونتاج فيديو (3 ساعات)'),
-        t('Distribution assistance', 'المساعدة في التوزيع'),
-        t('Lunch & refreshments', 'غداء ومرطبات'),
-      ],
-      highlighted: false,
-      ctaText: t('Book Now', 'احجز الآن'),
-    },
-  ];
+  // Map API packages to component format with bilingual features
+  const packages = ((studioData as StudioData)?.packages || []).map((pkg) => ({
+    title: pkg.title,
+    price: pkg.price,
+    period: pkg.period,
+    description: pkg.description,
+    features: pkg.features.map((f) => language === 'en' ? f.en : f.ar),
+    highlighted: pkg.highlighted,
+    ctaText: pkg.ctaText,
+  }));
 
-  const whyUs = [
-    {
-      icon: Zap,
-      title: t('Quick Turnaround', 'تسليم سريع'),
-      description: t(
-        'Get your edited podcast ready within 48 hours.',
-        'احصل على بودكاستك المحرر جاهزاً خلال 48 ساعة.'
-      ),
-    },
-    {
-      icon: Shield,
-      title: t('Professional Quality', 'جودة احترافية'),
-      description: t(
-        'Studio-grade equipment and expert production team.',
-        'معدات من مستوى الاستوديو وفريق إنتاج خبير.'
-      ),
-    },
-    {
-      icon: Award,
-      title: t('Proven Track Record', 'سجل حافل'),
-      description: t(
-        'Worked with 100+ podcasters and creators.',
-        'عملنا مع أكثر من 100 مقدم بودكاست ومبدع.'
-      ),
-    },
-  ];
+  // Map API why_us to component format with icon resolution
+  const whyUs = ((studioData as StudioData)?.why_us || [])
+    .reduce((acc: StudioWhyUs[], item, index) => {
+      // Remove duplicates by keeping unique IDs
+      if (index < 3) acc.push(item);
+      return acc;
+    }, [])
+    .map((item: StudioWhyUs) => ({
+      icon: getIcon(item.icon),
+      title: language === 'en' ? item.title_en : item.title_ar,
+      description: language === 'en' ? item.description_en : item.description_ar,
+    }));
 
-  const faqItems = [
-    {
-      question: t('What equipment is available in the studio?', 'ما هي المعدات المتاحة في الاستوديو؟'),
-      answer: t(
-        'Our studio features professional-grade microphones (Shure SM7B, Rode Procaster), digital mixer, multi-track recording software, soundproof booth, multi-camera video setup, and professional lighting.',
-        'يحتوي استوديونا على ميكروفونات احترافية (Shure SM7B, Rode Procaster)، مكسر رقمي، برنامج تسجيل متعدد المسارات، كابينة عازلة للصوت، إعداد فيديو متعدد الكاميرات، وإضاءة احترافية.'
-      ),
-    },
-    {
-      question: t('Do I need to bring anything?', 'هل أحتاج لإحضار أي شيء؟'),
-      answer: t(
-        'Just bring yourself and your content! We provide all equipment, including headphones. However, you are welcome to bring your own laptop or notes.',
-        'فقط أحضر نفسك ومحتواك! نوفر جميع المعدات، بما في ذلك سماعات الرأس. ومع ذلك، يمكنك إحضار الكمبيوتر المحمول أو الملاحظات الخاصة بك.'
-      ),
-    },
-    {
-      question: t('Can I record with guests remotely?', 'هل يمكنني التسجيل مع ضيوف عن بعد؟'),
-      answer: t(
-        'Yes! We have setup for remote guest recording with high-quality audio and video connections. Perfect for interviewing guests who cannot be physically present.',
-        'نعم! لدينا إعداد لتسجيل الضيوف عن بعد مع اتصالات صوت وفيديو عالية الجودة. مثالي لمقابلة الضيوف الذين لا يمكنهم الحضور شخصياً.'
-      ),
-    },
-    {
-      question: t('What is included in the editing service?', 'ما الذي يتضمنه خدمة التحرير؟'),
-      answer: t(
-        'Our editing service includes noise reduction, audio enhancement, removing pauses and filler words, adding intro/outro music, and basic mastering. Video editing includes multi-camera switching, color correction, and graphics.',
-        'تشمل خدمة التحرير لدينا تقليل الضوضاء، تحسين الصوت، إزالة التوقفات والكلمات الحشو، إضافة موسيقى المقدمة/الخاتمة، والماسترينج الأساسي. يتضمن مونتاج الفيديو التبديل بين الكاميرات المتعددة، تصحيح الألوان، والرسومات.'
-      ),
-    },
-    {
-      question: t('How do I book the studio?', 'كيف أحجز الاستوديو؟'),
-      answer: t(
-        'You can book directly through our website, call us, or send a WhatsApp message. We recommend booking at least 3-5 days in advance to secure your preferred time slot.',
-        'يمكنك الحجز مباشرة من خلال موقعنا، الاتصال بنا، أو إرسال رسالة واتساب. نوصي بالحجز قبل 3-5 أيام على الأقل لضمان الوقت المفضل لديك.'
-      ),
-    },
-  ];
+  // Map API FAQ items with bilingual support
+  const faqItems = ((studioData as StudioData)?.faq || []).map((item) => ({
+    question: language === 'en' ? item.question_en : item.question_ar,
+    answer: language === 'en' ? item.answer_en : item.answer_ar,
+  }));
 
   return (
     <div className="pt-20 lg:pt-20">

@@ -55,6 +55,18 @@ export const PUBLIC_ENDPOINTS = {
     HIGHLIGHTED: '/pricings/highlighted',
   },
 
+  // Studio
+  STUDIO: {
+    ALL: '/studio/all',
+    FEATURES: '/studio/features',
+    PACKAGES: '/studio/packages',
+    PACKAGES_ALL: '/studio/packages/all',
+    PACKAGES_HIGHLIGHTED: '/studio/packages/highlighted',
+    PACKAGES_DETAIL: (id: number) => `/studio/packages/${id}`,
+    WHY_US: '/studio/why-us',
+    FAQ: '/studio/faq',
+  },
+
   // Forms (Public submissions)
   FORMS: {
     CONTACT: '/contact',

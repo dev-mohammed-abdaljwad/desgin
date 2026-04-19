@@ -421,6 +421,65 @@ export interface Pricing {
   updated_at?: string;
 }
 
+// ============= Studio Types =============
+
+export interface StudioFeature {
+  id: number;
+  icon: string;
+  title: string;
+  title_en: string;
+  title_ar: string;
+  description: string;
+  description_en: string;
+  description_ar: string;
+  gradient: string;
+  created_at: string;
+}
+
+export interface StudioPackage {
+  id: number;
+  title: string;
+  price: string;
+  period: string;
+  description: string;
+  features: PricingFeature[];
+  highlighted: boolean;
+  ctaText: string;
+  created_at: string;
+}
+
+export interface StudioWhyUs {
+  id: number;
+  type: string;
+  icon: string;
+  title: string;
+  title_en: string;
+  title_ar: string;
+  description: string;
+  description_en: string;
+  description_ar: string;
+  created_at: string;
+}
+
+export interface StudioFAQ {
+  id: number;
+  type: string;
+  question: string;
+  question_en: string;
+  question_ar: string;
+  answer: string;
+  answer_en: string;
+  answer_ar: string;
+  created_at: string;
+}
+
+export interface StudioData {
+  features: StudioFeature[];
+  packages: StudioPackage[];
+  why_us: StudioWhyUs[];
+  faq: StudioFAQ[];
+}
+
 // ============= Settings Types =============
 
 export interface DesignSystemSettings {

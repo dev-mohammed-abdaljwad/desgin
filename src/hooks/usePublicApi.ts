@@ -4,9 +4,9 @@
  */
 
 import { useCallback } from 'react';
-import { pagesService, servicesService, postsService, productsService, projectsService, testimonialsService, whyChooseUsService, settingsService, pricingsService } from '../api/services/public';
+import { pagesService, servicesService, postsService, productsService, projectsService, testimonialsService, whyChooseUsService, settingsService, pricingsService, studioService } from '../api/services/public';
 import { usePaginatedApi, useApi, useLazyApi } from './useApi';
-import type { Page, Service, Post, Product, Project, Testimonial, WhyChooseUs, DesignSystemSettings, Pricing } from '../types/api';
+
 
 // ============= Pages Hooks =============
 
@@ -268,6 +268,66 @@ export function useHighlightedPricings() {
   );
 }
 
+// ============= Studio Hooks =============
+
+export function useStudioAll() {
+  return useApi(
+    () => studioService.getStudioAll(),
+    []
+  );
+}
+
+export function useStudioFeatures() {
+  return useApi(
+    () => studioService.getStudioFeatures(),
+    []
+  );
+}
+
+export function useStudioPackages(page: number = 1, perPage: number = 15) {
+  return usePaginatedApi(
+    (p, pp) => studioService.getStudioPackages(p, pp),
+    page,
+    perPage,
+    []
+  );
+}
+
+export function useAllStudioPackages() {
+  return useApi(
+    () => studioService.getAllStudioPackages(),
+    []
+  );
+}
+
+export function useHighlightedStudioPackages() {
+  return useApi(
+    () => studioService.getHighlightedStudioPackages(),
+    []
+  );
+}
+
+export function useStudioPackage(id: number) {
+  return useApi(
+    () => studioService.getStudioPackage(id),
+    [id]
+  );
+}
+
+export function useStudioWhyUs() {
+  return useApi(
+    () => studioService.getStudioWhyUs(),
+    []
+  );
+}
+
+export function useStudioFAQ() {
+  return useApi(
+    () => studioService.getStudioFAQ(),
+    []
+  );
+}
+
 // ============= Lazy Hooks (for manual triggering) =============
 
 export function useLazyPageBySlug() {
@@ -278,7 +338,7 @@ export function useLazyPageBySlug() {
 }
 
 export function useLazySearchPosts() {
-  const [execute, state] = useLazyApi(() => Promise.resolve(null));
+  const [, state] = useLazyApi(() => Promise.resolve(null));
 
   const search = useCallback(
     async (query: string, perPage?: number) => {
@@ -291,7 +351,7 @@ export function useLazySearchPosts() {
 }
 
 export function useLazySearchProjects() {
-  const [execute, state] = useLazyApi(() => Promise.resolve(null));
+  const [, state] = useLazyApi(() => Promise.resolve(null));
 
   const search = useCallback(
     async (query: string) => {
@@ -345,7 +405,7 @@ export function useCompanyValues() {
   ];
 
   // Try to get values from page metadata, fallback to defaults
-  const values = page?.metadata?.values || defaultValues;
+  const values = (page as any)?.metadata?.values || defaultValues;
 
   return { data: values, loading, error };
 }
