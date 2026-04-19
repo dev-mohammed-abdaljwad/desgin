@@ -98,8 +98,7 @@ export function PWAInstallPrompt() {
   // Show toast notification for Android/Desktop
   useEffect(() => {
     if (deferredPrompt && showPrompt && !isInstalled && !isIOS) {
-      toast({
-        description: 'Install this app to your device for quick access and offline use.',
+      toast('Install this app to your device for quick access and offline use.', {
         action: {
           label: 'Install',
           onClick: handleInstall,
