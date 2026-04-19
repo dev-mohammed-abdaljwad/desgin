@@ -3,14 +3,13 @@
  * Show PWA status and provide app management options
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Trash2, RefreshCw, Info, Download, Wifi, WifiOff } from 'lucide-react';
 import {
   isPWAInstalled,
   getServiceWorkerRegistration,
   clearCache,
   getCacheSize,
-  updateServiceWorker,
   requestNotificationPermission,
   sendNotification,
 } from '@/utils/pwa';
@@ -30,17 +29,17 @@ export function PWASettings() {
     loadCacheSize();
 
     // Listen for online/offline
-    window.addEventListener('online', () => setIsOnline(true));
-    window.addEventListener('offline', () => setIsOnline(false));
+    globalThis.addEventListener('online', () => setIsOnline(true));
+    globalThis.addEventListener('offline', () => setIsOnline(false));
 
     // Check notification permission
-    if ('Notification' in window) {
+    if ('Notification' in globalThis) {
       setHasNotificationPermission(Notification.permission === 'granted');
     }
 
     return () => {
-      window.removeEventListener('online', () => setIsOnline(true));
-      window.removeEventListener('offline', () => setIsOnline(false));
+      globalThis.removeEventListener('online', () => setIsOnline(true));
+      globalThis.removeEventListener('offline', () => setIsOnline(false));
     };
   }, []);
 
@@ -60,6 +59,7 @@ export function PWASettings() {
       setCacheSize(0);
       alert('Cache cleared successfully');
     } catch (error) {
+      console.error('Failed to clear cache:', error);
       alert('Failed to clear cache');
     } finally {
       setIsLoading(false);
@@ -75,6 +75,7 @@ export function PWASettings() {
         alert('Checked for updates');
       }
     } catch (error) {
+      console.error('Error checking for SW updates:', error);
       alert('Failed to check for updates');
     } finally {
       setIsLoading(false);
@@ -180,19 +181,19 @@ export function PWASettings() {
       {/* Notifications */}
       <div className="mb-6">
         <h3 className="font-semibold text-lg mb-3">Notifications</h3>
-        {!hasNotificationPermission ? (
-          <button
-            onClick={handleRequestNotifications}
-            className="w-full px-4 py-2 bg-purple-50 text-purple-600 hover:bg-purple-100 rounded-lg font-medium transition-colors"
-          >
-            Enable Notifications
-          </button>
-        ) : (
+        {hasNotificationPermission ? (
           <button
             onClick={handleTestNotification}
             className="w-full px-4 py-2 bg-purple-50 text-purple-600 hover:bg-purple-100 rounded-lg font-medium transition-colors"
           >
             Send Test Notification
+          </button>
+        ) : (
+          <button
+            onClick={handleRequestNotifications}
+            className="w-full px-4 py-2 bg-purple-50 text-purple-600 hover:bg-purple-100 rounded-lg font-medium transition-colors"
+          >
+            Enable Notifications
           </button>
         )}
       </div>

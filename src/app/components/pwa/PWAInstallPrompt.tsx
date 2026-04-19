@@ -3,7 +3,7 @@
  * Shows install prompts for different platforms
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { X, Download, Share2 } from 'lucide-react';
 
 interface BeforeInstallPromptEvent extends Event {
@@ -19,13 +19,13 @@ export function PWAInstallPrompt() {
 
   useEffect(() => {
     // Check if already installed
-    if (window.matchMedia('(display-mode: standalone)').matches) {
+    if (globalThis.matchMedia('(display-mode: standalone)').matches) {
       setIsInstalled(true);
       return;
     }
 
     // Detect iOS
-    const isAppleDevice = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const isAppleDevice = /iPad|iPhone|iPod/.test(globalThis.navigator.userAgent);
     setIsIOS(isAppleDevice);
 
     // Listen for beforeinstallprompt event
@@ -35,7 +35,7 @@ export function PWAInstallPrompt() {
       setShowPrompt(true);
     };
 
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    globalThis.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
     // Listen for app installed event
     const handleAppInstalled = () => {
@@ -44,11 +44,11 @@ export function PWAInstallPrompt() {
       console.log('[PWA] App installed successfully!');
     };
 
-    window.addEventListener('appinstalled', handleAppInstalled);
+    globalThis.addEventListener('appinstalled', handleAppInstalled);
 
     return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-      window.removeEventListener('appinstalled', handleAppInstalled);
+      globalThis.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      globalThis.removeEventListener('appinstalled', handleAppInstalled);
     };
   }, []);
 

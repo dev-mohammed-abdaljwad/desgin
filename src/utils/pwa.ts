@@ -43,7 +43,7 @@ export async function registerServiceWorker(options: ServiceWorkerOptions = {}) 
 
     // Listen for service worker updates
     registration.addEventListener('updatefound', () => {
-      const newWorker = registration!.installing;
+      const newWorker = registration.installing;
 
       if (newWorker) {
         newWorker.addEventListener('statechange', () => {
@@ -98,8 +98,8 @@ export async function unregisterServiceWorker() {
  */
 export function isPWAInstalled(): boolean {
   return (
-    window.matchMedia('(display-mode: standalone)').matches ||
-    (window.navigator as any).standalone === true
+    globalThis.matchMedia('(display-mode: standalone)').matches ||
+    (globalThis.navigator as any).standalone === true
   );
 }
 
@@ -107,7 +107,7 @@ export function isPWAInstalled(): boolean {
  * Request notification permission
  */
 export async function requestNotificationPermission(): Promise<boolean> {
-  if (!('Notification' in window)) {
+  if (!('Notification' in globalThis)) {
     console.warn('[PWA] Notifications are not supported');
     return false;
   }
@@ -222,7 +222,7 @@ function promptUserToRefresh() {
   `;
 
   refreshBtn.addEventListener('click', () => {
-    window.location.reload();
+    globalThis.location.reload();
   });
 
   message.appendChild(text);
