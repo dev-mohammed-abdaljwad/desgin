@@ -67,6 +67,21 @@ export const PUBLIC_ENDPOINTS = {
     FAQ: '/studio/faq',
   },
 
+  // Educational Platform
+  EDUCATIONAL: {
+    FEATURES: '/educational/features',
+    FEATURES_STUDENT: '/educational/features/student',
+    FEATURES_TEACHER: '/educational/features/teacher',
+    FEATURES_DETAIL: (id: number) => `/educational/features/${id}`,
+    PLANS: '/educational/plans',
+    PLANS_HIGHLIGHTED: '/educational/plans/highlighted',
+    PLANS_DETAIL: (id: number) => `/educational/plans/${id}`,
+    STATS: '/educational/stats',
+    STATS_DETAIL: (id: number) => `/educational/stats/${id}`,
+    BENEFITS: '/educational/benefits',
+    BENEFITS_DETAIL: (id: number) => `/educational/benefits/${id}`,
+  },
+
   // Forms (Public submissions)
   FORMS: {
     CONTACT: '/contact',

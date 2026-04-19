@@ -22,6 +22,10 @@ import type {
   StudioPackage,
   StudioWhyUs,
   StudioFAQ,
+  EducationalFeature,
+  EducationalPlan,
+  EducationalStat,
+  EducationalBenefit,
 } from '../../types/api';
 
 class PagesService {
@@ -427,6 +431,71 @@ class StudioService {
   }
 }
 
+class EducationalService {
+  private readonly httpClient: HttpClient;
+
+  constructor() {
+    this.httpClient = HttpClient.getInstance();
+  }
+
+  /**
+   * Get all educational features
+   */
+  async getFeatures(page: number = 1, perPage: number = 10): Promise<PaginatedResponse<EducationalFeature>> {
+    return this.httpClient.get<PaginatedResponse<EducationalFeature>>(
+      `${PUBLIC_ENDPOINTS.EDUCATIONAL.FEATURES}?page=${page}&per_page=${perPage}`
+    );
+  }
+
+  /**
+   * Get student features
+   */
+  async getStudentFeatures(): Promise<ApiResponse<EducationalFeature[]>> {
+    return this.httpClient.get<ApiResponse<EducationalFeature[]>>(PUBLIC_ENDPOINTS.EDUCATIONAL.FEATURES_STUDENT);
+  }
+
+  /**
+   * Get teacher features
+   */
+  async getTeacherFeatures(): Promise<ApiResponse<EducationalFeature[]>> {
+    return this.httpClient.get<ApiResponse<EducationalFeature[]>>(PUBLIC_ENDPOINTS.EDUCATIONAL.FEATURES_TEACHER);
+  }
+
+  /**
+   * Get all educational plans
+   */
+  async getPlans(page: number = 1, perPage: number = 10): Promise<PaginatedResponse<EducationalPlan>> {
+    return this.httpClient.get<PaginatedResponse<EducationalPlan>>(
+      `${PUBLIC_ENDPOINTS.EDUCATIONAL.PLANS}?page=${page}&per_page=${perPage}`
+    );
+  }
+
+  /**
+   * Get highlighted educational plans
+   */
+  async getHighlightedPlans(): Promise<ApiResponse<EducationalPlan[]>> {
+    return this.httpClient.get<ApiResponse<EducationalPlan[]>>(PUBLIC_ENDPOINTS.EDUCATIONAL.PLANS_HIGHLIGHTED);
+  }
+
+  /**
+   * Get all educational stats
+   */
+  async getStats(page: number = 1, perPage: number = 10): Promise<PaginatedResponse<EducationalStat>> {
+    return this.httpClient.get<PaginatedResponse<EducationalStat>>(
+      `${PUBLIC_ENDPOINTS.EDUCATIONAL.STATS}?page=${page}&per_page=${perPage}`
+    );
+  }
+
+  /**
+   * Get all educational benefits
+   */
+  async getBenefits(page: number = 1, perPage: number = 10): Promise<PaginatedResponse<EducationalBenefit>> {
+    return this.httpClient.get<PaginatedResponse<EducationalBenefit>>(
+      `${PUBLIC_ENDPOINTS.EDUCATIONAL.BENEFITS}?page=${page}&per_page=${perPage}`
+    );
+  }
+}
+
 // Export service instances
 export const pagesService = new PagesService();
 export const servicesService = new ServicesService();
@@ -438,3 +507,4 @@ export const whyChooseUsService = new WhyChooseUsService();
 export const settingsService = new SettingsService();
 export const pricingsService = new PricingsService();
 export const studioService = new StudioService();
+export const educationalService = new EducationalService();

@@ -503,6 +503,77 @@ export interface StudioData {
   faq: StudioFAQ[];
 }
 
+// ============= Educational Platform Types =============
+
+export interface EducationalFeature {
+  id: number;
+  type: 'student' | 'teacher';
+  icon: string;
+  title: string;
+  title_en: string;
+  title_ar: string;
+  description: string;
+  description_en: string;
+  description_ar: string;
+  gradient: string;
+  is_active: boolean;
+  order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface EducationalPlan {
+  id: number;
+  title: string;
+  title_en: string;
+  title_ar: string;
+  price: string;
+  period: string;
+  period_en: string;
+  period_ar: string;
+  description: string;
+  description_en: string;
+  description_ar: string;
+  features: PricingFeature[];
+  is_highlighted: boolean;
+  cta_text: string;
+  cta_text_en: string;
+  cta_text_ar: string;
+  is_active: boolean;
+  order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface EducationalStat {
+  id: number;
+  icon: string;
+  value: string;
+  suffix: string;
+  label: string;
+  label_en: string;
+  label_ar: string;
+  order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface EducationalBenefit {
+  id: number;
+  icon: string;
+  title: string;
+  title_en: string;
+  title_ar: string;
+  description: string;
+  description_en: string;
+  description_ar: string;
+  order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 // ============= Settings Types =============
 
 export interface DesignSystemSettings {

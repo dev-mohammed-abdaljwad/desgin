@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { PricingCard } from '../components/ui/PricingCard';
 import { ServiceCard } from '../components/ui/ServiceCard';
 import { StatsCard } from '../components/ui/StatsCard';
+import type { LucideIcon } from 'lucide-react';
 import {
   GraduationCap,
   BookOpen,
@@ -20,191 +21,77 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { Link } from 'react-router';
+import { useEducationalStudentFeatures, useEducationalTeacherFeatures, useEducationalHighlightedPlans, useEducationalStats, useEducationalBenefits } from '../../hooks/usePublicApi';
+import type { EducationalFeature, EducationalPlan, EducationalStat, EducationalBenefit } from '../../types/api';
+
+// Icon mapping utility
+const iconMap: Record<string, LucideIcon> = {
+  Video,
+  BookOpen,
+  Target,
+  Award,
+  Users,
+  TrendingUp,
+  Zap,
+  Shield,
+  Clock,
+  CheckCircle,
+  Star,
+  Mic: Video,
+  Camera: Video,
+};
+
+const getIcon = (iconName: string): LucideIcon => iconMap[iconName] || Video;
 
 export function EducationalPlatform() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const { data: studentFeaturesData } = useEducationalStudentFeatures();
+  const { data: teacherFeaturesData } = useEducationalTeacherFeatures();
+  const { data: plansData } = useEducationalHighlightedPlans();
+  const { data: statsData } = useEducationalStats(1, 10);
+  const { data: benefitsData } = useEducationalBenefits(1, 10);
 
-  const forStudents = [
-    {
-      icon: Video,
-      title: t('Watch Lessons', 'شاهد الدروس'),
-      description: t(
-        'Access high-quality video lessons from expert teachers anytime, anywhere.',
-        'احصل على دروس فيديو عالية الجودة من معلمين خبراء في أي وقت وفي أي مكان.'
-      ),
-      gradient: 'from-primary to-accent',
-    },
-    {
-      icon: BookOpen,
-      title: t('Organized Subjects', 'مواد منظمة'),
-      description: t(
-        'Content organized by grade, subject, and difficulty level for easy learning.',
-        'محتوى منظم حسب الصف والموضوع ومستوى الصعوبة للتعلم السهل.'
-      ),
-      gradient: 'from-accent to-secondary',
-    },
-    {
-      icon: Target,
-      title: t('Track Progress', 'تتبع التقدم'),
-      description: t(
-        'Monitor your learning progress with detailed analytics and reports.',
-        'راقب تقدمك في التعلم باستخدام التحليلات والتقارير التفصيلية.'
-      ),
-      gradient: 'from-secondary to-gold',
-    },
-    {
-      icon: Award,
-      title: t('Get Certified', 'احصل على شهادة'),
-      description: t(
-        'Earn certificates upon course completion to showcase your achievements.',
-        'احصل على شهادات عند إكمال الدورة لعرض إنجازاتك.'
-      ),
-      gradient: 'from-gold to-primary',
-    },
-  ];
+  // Transform API student features to component format
+  const forStudents = (studentFeaturesData || []).map((feature: EducationalFeature, index: number) => ({
+    icon: getIcon(feature.icon),
+    title: language === 'en' ? feature.title_en : feature.title_ar,
+    description: language === 'en' ? feature.description_en : feature.description_ar,
+    gradient: feature.gradient,
+  }));
 
-  const forTeachers = [
-    {
-      icon: Video,
-      title: t('Record in Studio', 'سجل في الاستوديو'),
-      description: t(
-        'Use our professional studio to record high-quality educational content.',
-        'استخدم استوديونا الاحترافي لتسجيل محتوى تعليمي عالي الجودة.'
-      ),
-      gradient: 'from-primary to-secondary',
-    },
-    {
-      icon: Users,
-      title: t('Reach Students', 'اوصل للطلاب'),
-      description: t(
-        'Connect with thousands of students eager to learn from you.',
-        'تواصل مع آلاف الطلاب المتحمسين للتعلم منك.'
-      ),
-      gradient: 'from-accent to-gold',
-    },
-    {
-      icon: TrendingUp,
-      title: t('Earn Revenue', 'اكسب دخلاً'),
-      description: t(
-        'Generate income from your courses with our transparent revenue sharing.',
-        'حقق دخلاً من دوراتك مع نموذج مشاركة الإيرادات الشفاف لدينا.'
-      ),
-      gradient: 'from-secondary to-primary',
-    },
-    {
-      icon: Zap,
-      title: t('Easy Management', 'إدارة سهلة'),
-      description: t(
-        'Intuitive dashboard to manage your courses, students, and analytics.',
-        'لوحة تحكم بديهية لإدارة دوراتك وطلابك والتحليلات.'
-      ),
-      gradient: 'from-gold to-accent',
-    },
-  ];
+  // Transform API teacher features to component format
+  const forTeachers = (teacherFeaturesData || []).map((feature: EducationalFeature, index: number) => ({
+    icon: getIcon(feature.icon),
+    title: language === 'en' ? feature.title_en : feature.title_ar,
+    description: language === 'en' ? feature.description_en : feature.description_ar,
+    gradient: feature.gradient,
+  }));
 
-  const studentPlans = [
-    {
-      title: t('Monthly', 'شهري'),
-      price: '99',
-      period: t('month', 'شهر'),
-      description: t('Full access to all courses', 'وصول كامل لجميع الدورات'),
-      features: [
-        t('Unlimited course access', 'وصول غير محدود للدورات'),
-        t('HD video quality', 'جودة فيديو عالية الدقة'),
-        t('Downloadable resources', 'موارد قابلة للتحميل'),
-        t('Progress tracking', 'تتبع التقدم'),
-        t('Mobile app access', 'الوصول عبر تطبيق الموبايل'),
-      ],
-      highlighted: false,
-      ctaText: t('Subscribe Now', 'اشترك الآن'),
-    },
-    {
-      title: t('Quarterly', 'ربع سنوي'),
-      price: '249',
-      period: t('3 months', '3 أشهر'),
-      description: t('Save 16% with quarterly plan', 'وفر 16٪ مع الخطة ربع السنوية'),
-      features: [
-        t('All Monthly features', 'جميع مميزات الخطة الشهرية'),
-        t('Priority support', 'دعم ذو أولوية'),
-        t('Live Q&A sessions', 'جلسات أسئلة وأجوبة مباشرة'),
-        t('Exclusive webinars', 'ندوات حصرية'),
-        t('Study groups access', 'الوصول إلى مجموعات الدراسة'),
-        t('Certificate included', 'شهادة متضمنة'),
-      ],
-      highlighted: true,
-      ctaText: t('Subscribe Now', 'اشترك الآن'),
-    },
-    {
-      title: t('Yearly', 'سنوي'),
-      price: '799',
-      period: t('year', 'سنة'),
-      description: t('Best value - Save 33%', 'أفضل قيمة - وفر 33٪'),
-      features: [
-        t('All Quarterly features', 'جميع مميزات الخطة ربع السنوية'),
-        t('Personal learning coach', 'مدرب تعلم شخصي'),
-        t('Offline downloads', 'تحميلات دون اتصال'),
-        t('Early access to new courses', 'وصول مبكر للدورات الجديدة'),
-        t('Premium certificates', 'شهادات مميزة'),
-        t('Family plan (3 accounts)', 'خطة عائلية (3 حسابات)'),
-      ],
-      highlighted: false,
-      ctaText: t('Subscribe Now', 'اشترك الآن'),
-    },
-  ];
+  // Transform API plans to component format
+  const studentPlans = (plansData || []).map((plan: EducationalPlan, index: number) => ({
+    title: language === 'en' ? plan.title_en : plan.title_ar,
+    price: plan.price,
+    period: language === 'en' ? plan.period_en : plan.period_ar,
+    description: language === 'en' ? plan.description_en : plan.description_ar,
+    features: plan.features.map((f: any) => language === 'en' ? f.en : f.ar),
+    highlighted: plan.is_highlighted,
+    ctaText: language === 'en' ? plan.cta_text_en : plan.cta_text_ar,
+  }));
 
-  const stats = [
-    {
-      icon: Users,
-      value: '10000',
-      suffix: '+',
-      label: t('Active Students', 'طالب نشط'),
-    },
-    {
-      icon: GraduationCap,
-      value: '200',
-      suffix: '+',
-      label: t('Expert Teachers', 'معلم خبير'),
-    },
-    {
-      icon: BookOpen,
-      value: '500',
-      suffix: '+',
-      label: t('Courses Available', 'دورة متاحة'),
-    },
-    {
-      icon: Star,
-      value: '4.8',
-      suffix: '/5',
-      label: t('Average Rating', 'متوسط التقييم'),
-    },
-  ];
+  // Transform API stats to component format
+  const stats = (statsData || []).map((stat: EducationalStat, index: number) => ({
+    icon: getIcon(stat.icon),
+    value: stat.value,
+    suffix: stat.suffix,
+    label: language === 'en' ? stat.label_en : stat.label_ar,
+  }));
 
-  const benefits = [
-    {
-      icon: Shield,
-      title: t('Quality Content', 'محتوى عالي الجودة'),
-      description: t(
-        'All courses are reviewed and approved by our quality assurance team.',
-        'جميع الدورات مراجعة ومعتمدة من فريق ضمان الجودة لدينا.'
-      ),
-    },
-    {
-      icon: Clock,
-      title: t('Learn at Your Pace', 'تعلم بالسرعة التي تناسبك'),
-      description: t(
-        'Study anytime, anywhere with lifetime access to purchased courses.',
-        'ادرس في أي وقت وفي أي مكان مع وصول مدى الحياة للدورات المشتراة.'
-      ),
-    },
-    {
-      icon: CheckCircle,
-      title: t('Certification', 'شهادات معتمدة'),
-      description: t(
-        'Receive recognized certificates to boost your academic credentials.',
-        'احصل على شهادات معترف بها لتعزيز مؤهلاتك الأكاديمية.'
-      ),
-    },
-  ];
+  // Transform API benefits to component format
+  const benefits = (benefitsData || []).map((benefit: EducationalBenefit, index: number) => ({
+    icon: getIcon(benefit.icon),
+    title: language === 'en' ? benefit.title_en : benefit.title_ar,
+    description: language === 'en' ? benefit.description_en : benefit.description_ar,
+  }));
 
   return (
     <div className="pt-20 lg:pt-20">
@@ -229,7 +116,7 @@ export function EducationalPlatform() {
                 <span className="text-sm font-medium text-gold">{t('Learn & Teach', 'تعلم وعلّم')}</span>
               </div>
 
-              <h1 className="font-[var(--font-display)] font-bold text-5xl lg:text-7xl mb-6 leading-tight">
+              <h1 className="font-[var(--font-display)] text-5xl lg:text-7xl mb-6 leading-tight">
                 {t('Educational ', '')}
                 <span className="bg-gradient-to-r from-gold via-primary to-accent bg-clip-text text-transparent">
                   {t('Platform', 'منصة تعليمية')}
@@ -285,7 +172,7 @@ export function EducationalPlatform() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
             {stats.map((stat, index) => (
-              <StatsCard key={index} {...stat} />
+              <StatsCard key={`stat-${stat.label}-${stat.value}`} {...stat} />
             ))}
           </div>
         </div>
@@ -304,7 +191,7 @@ export function EducationalPlatform() {
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
                 <GraduationCap className="w-6 h-6 text-white" />
               </div>
-              <h2 className="font-[var(--font-display)] font-bold text-3xl lg:text-4xl">
+              <h2 className="font-[var(--font-display)] text-3xl lg:text-4xl">
                 {t('For Students', 'للطلاب')}
               </h2>
             </div>
@@ -319,7 +206,7 @@ export function EducationalPlatform() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {forStudents.map((item, index) => (
               <motion.div
-                key={index}
+                key={`student-${item.title}`}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -341,7 +228,7 @@ export function EducationalPlatform() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="font-[var(--font-display)] font-bold text-4xl lg:text-5xl mb-4">
+            <h2 className="font-[var(--font-display)] text-4xl lg:text-5xl mb-4">
               {t('Student Subscription Plans', 'خطط اشتراك الطلاب')}
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -355,13 +242,13 @@ export function EducationalPlatform() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {studentPlans.map((plan, index) => (
               <motion.div
-                key={index}
+                key={`plan-${plan.title}`}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
               >
-                <PricingCard {...plan} onCTAClick={() => window.location.href = '/contact'} />
+                <PricingCard {...plan} onCTAClick={() => globalThis.location.href = '/contact'} />
               </motion.div>
             ))}
           </div>
@@ -381,7 +268,7 @@ export function EducationalPlatform() {
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-gold to-secondary flex items-center justify-center">
                 <Users className="w-6 h-6 text-white" />
               </div>
-              <h2 className="font-[var(--font-display)] font-bold text-3xl lg:text-4xl">
+              <h2 className="font-[var(--font-display)] text-3xl lg:text-4xl">
                 {t('For Teachers', 'للمعلمين')}
               </h2>
             </div>
@@ -396,7 +283,7 @@ export function EducationalPlatform() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {forTeachers.map((item, index) => (
               <motion.div
-                key={index}
+                key={`teacher-${item.title}`}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -428,7 +315,7 @@ export function EducationalPlatform() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="font-[var(--font-display)] font-bold text-4xl lg:text-5xl mb-4">
+            <h2 className="font-[var(--font-display)] text-4xl lg:text-5xl mb-4">
               {t('Why Choose Our Platform', 'لماذا تختار منصتنا')}
             </h2>
           </motion.div>
@@ -436,7 +323,7 @@ export function EducationalPlatform() {
           <div className="grid md:grid-cols-3 gap-8">
             {benefits.map((benefit, index) => (
               <motion.div
-                key={index}
+                key={`benefit-${benefit.title}`}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -458,7 +345,7 @@ export function EducationalPlatform() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
           >
-            <h2 className="font-[var(--font-display)] font-bold text-4xl lg:text-5xl mb-6">
+            <h2 className="font-[var(--font-display)] text-4xl lg:text-5xl mb-6">
               {t('Start Your Learning Journey', 'ابدأ رحلة التعلم')}
             </h2>
             <p className="text-xl text-muted-foreground mb-8">

@@ -4,8 +4,9 @@
  */
 
 import { useCallback } from 'react';
-import { pagesService, servicesService, postsService, productsService, projectsService, testimonialsService, whyChooseUsService, settingsService, pricingsService, studioService } from '../api/services/public';
+import { pagesService, servicesService, postsService, productsService, projectsService, testimonialsService, whyChooseUsService, settingsService, pricingsService, studioService, educationalService } from '../api/services/public';
 import { usePaginatedApi, useApi, useLazyApi } from './useApi';
+import type { EducationalFeature, EducationalPlan, EducationalStat, EducationalBenefit } from '../types/api';
 
 
 // ============= Pages Hooks =============
@@ -324,6 +325,56 @@ export function useStudioWhyUs() {
 export function useStudioFAQ() {
   return useApi(
     () => studioService.getStudioFAQ(),
+    []
+  );
+}
+
+// ============= Educational Platform Hooks =============
+
+export function useEducationalStudentFeatures() {
+  return useApi<EducationalFeature[]>(
+    () => educationalService.getStudentFeatures(),
+    []
+  );
+}
+
+export function useEducationalTeacherFeatures() {
+  return useApi<EducationalFeature[]>(
+    () => educationalService.getTeacherFeatures(),
+    []
+  );
+}
+
+export function useEducationalPlans(page: number = 1, perPage: number = 10) {
+  return usePaginatedApi<EducationalPlan>(
+    (p, pp) => educationalService.getPlans(p, pp),
+    page,
+    perPage,
+    []
+  );
+}
+
+export function useEducationalHighlightedPlans() {
+  return useApi<EducationalPlan[]>(
+    () => educationalService.getHighlightedPlans(),
+    []
+  );
+}
+
+export function useEducationalStats(page: number = 1, perPage: number = 10) {
+  return usePaginatedApi<EducationalStat>(
+    (p, pp) => educationalService.getStats(p, pp),
+    page,
+    perPage,
+    []
+  );
+}
+
+export function useEducationalBenefits(page: number = 1, perPage: number = 10) {
+  return usePaginatedApi<EducationalBenefit>(
+    (p, pp) => educationalService.getBenefits(p, pp),
+    page,
+    perPage,
     []
   );
 }
