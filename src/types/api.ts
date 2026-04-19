@@ -135,7 +135,8 @@ export interface Post {
   content: BilingualText;
   excerpt: BilingualText;
   type: PostType;
-  category_id: number;
+  category_id?: number;
+  category?: Category;
   slug: string;
   thumbnail: string;
   featured_image: string;
@@ -398,6 +399,26 @@ export interface CreateProductInquiryRequest {
   phone: string;
   message: string;
   product_id: number;
+}
+
+// ============= Pricing Package Types =============
+
+export interface PricingFeature {
+  ar: string;
+  en: string;
+}
+
+export interface Pricing {
+  id: number;
+  title: string;
+  description: string;
+  price: string;
+  period: string;
+  features: PricingFeature[];
+  highlighted: boolean;
+  ctaText: string;
+  created_at: string;
+  updated_at?: string;
 }
 
 // ============= Settings Types =============

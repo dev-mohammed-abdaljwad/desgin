@@ -16,8 +16,7 @@ import type {
   WhyChooseUs,
   DesignSystemSettings,
   ApiResponse,
-  PaginatedResponse,
-} from '../../types/api';
+  PaginatedResponse,  Pricing,} from '../../types/api';
 
 class PagesService {
   private httpClient: HttpClient;
@@ -326,6 +325,44 @@ class WhyChooseUsService {
   }
 }
 
+class PricingsService {
+  private httpClient: HttpClient;
+
+  constructor() {
+    this.httpClient = HttpClient.getInstance();
+  }
+
+  /**
+   * Get all pricing packages (with pagination)
+   */
+  async getPricings(page: number = 1, perPage: number = 15): Promise<PaginatedResponse<Pricing>> {
+    return this.httpClient.get<PaginatedResponse<Pricing>>(
+      `${PUBLIC_ENDPOINTS.PRICINGS.LIST}?page=${page}&per_page=${perPage}`
+    );
+  }
+
+  /**
+   * Get all pricing packages (no pagination)
+   */
+  async getAllPricings(): Promise<ApiResponse<Pricing[]>> {
+    return this.httpClient.get<ApiResponse<Pricing[]>>(PUBLIC_ENDPOINTS.PRICINGS.ALL);
+  }
+
+  /**
+   * Get single pricing package by ID
+   */
+  async getPricing(id: number): Promise<ApiResponse<Pricing>> {
+    return this.httpClient.get<ApiResponse<Pricing>>(PUBLIC_ENDPOINTS.PRICINGS.DETAIL(id));
+  }
+
+  /**
+   * Get highlighted pricing packages
+   */
+  async getHighlightedPricings(): Promise<ApiResponse<Pricing[]>> {
+    return this.httpClient.get<ApiResponse<Pricing[]>>(PUBLIC_ENDPOINTS.PRICINGS.HIGHLIGHTED);
+  }
+}
+
 // Export service instances
 export const pagesService = new PagesService();
 export const servicesService = new ServicesService();
@@ -335,3 +372,4 @@ export const projectsService = new ProjectsService();
 export const testimonialsService = new TestimonialsService();
 export const whyChooseUsService = new WhyChooseUsService();
 export const settingsService = new SettingsService();
+export const pricingsService = new PricingsService();

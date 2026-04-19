@@ -47,6 +47,14 @@ export const PUBLIC_ENDPOINTS = {
     SEARCH: '/projects/search',
   },
 
+  // Pricing Packages
+  PRICINGS: {
+    LIST: '/pricings',
+    ALL: '/pricings/all',
+    DETAIL: (id: number) => `/pricings/${id}`,
+    HIGHLIGHTED: '/pricings/highlighted',
+  },
+
   // Forms (Public submissions)
   FORMS: {
     CONTACT: '/contact',

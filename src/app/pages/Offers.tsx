@@ -3,107 +3,27 @@ import { motion } from 'motion/react';
 import { PricingCard } from '../components/ui/PricingCard';
 import { Sparkles, Tag, TrendingDown, Clock, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router';
+import { usePricings } from '../../hooks/usePublicApi';
+import type { Pricing } from '../../types/api';
 
 export function Offers() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
-  const offers = [
-    {
-      title: t('Social Media Starter', 'باقة السوشيال ميديا المبتدئة'),
-      price: '1,499',
-      period: t('month', 'شهر'),
-      description: t('Perfect for small businesses', 'مثالية للشركات الصغيرة'),
-      features: [
-        t('15 social media posts/month', '15 منشور شهرياً'),
-        t('Basic graphic design', 'تصميم جرافيكي أساسي'),
-        t('Content calendar', 'تقويم محتوى'),
-        t('Monthly analytics report', 'تقرير تحليلي شهري'),
-        t('2 platforms management', 'إدارة منصتين'),
-      ],
-      highlighted: false,
-      ctaText: t('Claim Offer', 'احصل على العرض'),
-    },
-    {
-      title: t('Podcast Launch Package', 'باقة إطلاق البودكاست'),
-      price: '4,999',
-      period: t('one-time', 'دفعة واحدة'),
-      description: t('Everything to start your podcast', 'كل ما تحتاجه لبدء بودكاستك'),
-      features: [
-        t('3 full-day studio sessions', '3 جلسات يوم كامل'),
-        t('Professional editing (6 episodes)', 'تحرير احترافي (6 حلقات)'),
-        t('Podcast cover design', 'تصميم غلاف البودكاست'),
-        t('Distribution to all platforms', 'توزيع على جميع المنصات'),
-        t('Social media promotion package', 'باقة ترويج على السوشيال ميديا'),
-        t('1 month free hosting', 'شهر استضافة مجاناً'),
-      ],
-      highlighted: true,
-      ctaText: t('Claim Offer', 'احصل على العرض'),
-    },
-    {
-      title: t('Student Annual Plan', 'خطة الطالب السنوية'),
-      price: '599',
-      period: t('year', 'سنة'),
-      description: t('Save 40% on education platform', 'وفر 40٪ على المنصة التعليمية'),
-      features: [
-        t('All courses unlimited access', 'وصول غير محدود لجميع الدورات'),
-        t('HD & offline downloads', 'تحميلات HD ودون اتصال'),
-        t('Personal learning coach', 'مدرب تعلم شخصي'),
-        t('Premium certificates', 'شهادات مميزة'),
-        t('Live Q&A sessions', 'جلسات أسئلة وأجوبة مباشرة'),
-        t('Early access to new content', 'وصول مبكر للمحتوى الجديد'),
-      ],
-      highlighted: false,
-      ctaText: t('Claim Offer', 'احصل على العرض'),
-    },
-    {
-      title: t('Teacher Launch Offer', 'عرض إطلاق المعلم'),
-      price: '0',
-      period: t('first 3 months', 'أول 3 أشهر'),
-      description: t('Free for first 50 teachers', 'مجاناً لأول 50 معلماً'),
-      features: [
-        t('Free studio recording (4 hours)', 'تسجيل مجاني في الاستوديو (4 ساعات)'),
-        t('Professional video editing', 'مونتاج فيديو احترافي'),
-        t('Course setup assistance', 'المساعدة في إعداد الدورة'),
-        t('0% platform fee (3 months)', '0٪ عمولة منصة (3 أشهر)'),
-        t('Marketing support', 'دعم تسويقي'),
-        t('Priority listing', 'قائمة ذات أولوية'),
-      ],
-      highlighted: true,
-      ctaText: t('Claim Offer', 'احصل على العرض'),
-    },
-    {
-      title: t('Brand Package', 'باقة العلامة التجارية'),
-      price: '7,999',
-      period: t('one-time', 'دفعة واحدة'),
-      description: t('Complete branding solution', 'حل كامل للعلامة التجارية'),
-      features: [
-        t('Logo design (3 concepts)', 'تصميم شعار (3 مفاهيم)'),
-        t('Brand guidelines document', 'دليل إرشادات العلامة التجارية'),
-        t('Business card & stationery', 'بطاقة عمل وقرطاسية'),
-        t('Social media templates (20)', 'قوالب سوشيال ميديا (20)'),
-        t('Website design (5 pages)', 'تصميم موقع (5 صفحات)'),
-        t('6 months support', '6 أشهر دعم'),
-      ],
-      highlighted: false,
-      ctaText: t('Claim Offer', 'احصل على العرض'),
-    },
-    {
-      title: t('Video Production Bundle', 'حزمة إنتاج الفيديو'),
-      price: '9,999',
-      period: t('package', 'باقة'),
-      description: t('5 professional videos', '5 فيديوهات احترافية'),
-      features: [
-        t('5 professional videos (up to 2 min each)', '5 فيديوهات احترافية (حتى 2 دقيقة لكل منها)'),
-        t('Full production crew', 'طاقم إنتاج كامل'),
-        t('Professional editing & effects', 'تحرير وتأثيرات احترافية'),
-        t('Background music & voiceover', 'موسيقى خلفية وتعليق صوتي'),
-        t('Social media optimization', 'تحسين للسوشيال ميديا'),
-        t('2 revision rounds per video', 'جولتان مراجعة لكل فيديو'),
-      ],
-      highlighted: false,
-      ctaText: t('Claim Offer', 'احصل على العرض'),
-    },
-  ];
+  // Fetch pricing packages from API
+  const { data: pricingsList } = usePricings(1, 100);
+
+  // Map API pricing packages to card format with bilingual support
+  const offers = ((pricingsList as Pricing[]) || []).map((pricing: Pricing) => ({
+    title: pricing.title,
+    price: pricing.price,
+    period: pricing.period,
+    description: pricing.description,
+    features: pricing.features.map((feature) => 
+      language === 'en' ? feature.en : feature.ar
+    ),
+    highlighted: pricing.highlighted,
+    ctaText: pricing.ctaText,
+  }));
 
   return (
     <div className="pt-20 lg:pt-20">

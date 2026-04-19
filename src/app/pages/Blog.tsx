@@ -3,12 +3,22 @@ import { useLanguage } from '../context/LanguageContext';
 import { motion } from 'motion/react';
 import { BlogCard } from '../components/ui/BlogCard';
 import { Search, Filter } from 'lucide-react';
+import { useFeaturedPosts, usePostsByType, useSearchPosts } from '../../hooks/usePublicApi';
+import type { Post } from '../../types/api';
 
 export function Blog() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
+  
+  // Fetch blog posts from API using type-specific endpoint
+  const { data: postsList } = usePostsByType('blog', 100);
+  const { data: featuredPostsList } = useFeaturedPosts();
+  
+  // Search posts from API only when search query has content
+  const { data: searchResultsList } = useSearchPosts(searchQuery, 100);
 
+  // Static categories for filtering
   const categories = [
     { id: 'all', label: t('All', 'الكل') },
     { id: 'marketing', label: t('Marketing', 'التسويق') },
@@ -18,131 +28,53 @@ export function Blog() {
     { id: 'business', label: t('Business', 'أعمال') },
   ];
 
-  const posts = [
-    {
-      title: t('10 Marketing Trends Dominating 2026', '10 اتجاهات تسويقية تهيمن على 2026'),
-      excerpt: t(
-        'Discover the latest marketing trends that are reshaping the industry and how to leverage them for your business.',
-        'اكتشف أحدث الاتجاهات التسويقية التي تعيد تشكيل الصناعة وكيفية الاستفادة منها لعملك.'
-      ),
-      image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80',
-      category: t('Marketing', 'التسويق'),
-      categoryId: 'marketing',
-      date: t('Apr 10, 2026', '10 أبريل 2026'),
-      readTime: t('5 min read', '5 دقائق'),
-      slug: 'marketing-trends-2026',
-    },
-    {
-      title: t('The Complete Guide to Starting Your Own Podcast', 'الدليل الكامل لبدء البودكاست الخاص بك'),
-      excerpt: t(
-        'Everything you need to know about launching a successful podcast, from equipment to distribution strategies.',
-        'كل ما تحتاج معرفته حول إطلاق بودكاست ناجح، من المعدات إلى استراتيجيات التوزيع.'
-      ),
-      image: 'https://images.unsplash.com/photo-1590602847861-f357a9332bbc?w=800&q=80',
-      category: t('Podcast', 'بودكاست'),
-      categoryId: 'podcast',
-      date: t('Apr 8, 2026', '8 أبريل 2026'),
-      readTime: t('7 min read', '7 دقائق'),
-      slug: 'start-podcast-guide',
-    },
-    {
-      title: t('How Online Learning is Transforming Education', 'كيف يحول التعلم الإلكتروني التعليم'),
-      excerpt: t(
-        'Explore how online learning platforms are revolutionizing education for both students and teachers worldwide.',
-        'استكشف كيف تُحدث منصات التعلم الإلكتروني ثورة في التعليم للطلاب والمعلمين في جميع أنحاء العالم.'
-      ),
-      image: 'https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=800&q=80',
-      category: t('Education', 'التعليم'),
-      categoryId: 'education',
-      date: t('Apr 5, 2026', '5 أبريل 2026'),
-      readTime: t('6 min read', '6 دقائق'),
-      slug: 'online-learning-future',
-    },
-    {
-      title: t('The Psychology of Color in Brand Design', 'سيكولوجية الألوان في تصميم العلامة التجارية'),
-      excerpt: t(
-        'Learn how color psychology influences consumer behavior and how to choose the right colors for your brand.',
-        'تعلم كيف تؤثر سيكولوجية الألوان على سلوك المستهلك وكيفية اختيار الألوان المناسبة لعلامتك التجارية.'
-      ),
-      image: 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=800&q=80',
-      category: t('Design', 'التصميم'),
-      categoryId: 'design',
-      date: t('Apr 3, 2026', '3 أبريل 2026'),
-      readTime: t('4 min read', '4 دقائق'),
-      slug: 'color-psychology-branding',
-    },
-    {
-      title: t('Social Media Algorithm Changes: What You Need to Know', 'تغييرات خوارزمية السوشيال ميديا: ما تحتاج معرفته'),
-      excerpt: t(
-        'Stay updated on the latest social media algorithm changes and how to adapt your content strategy accordingly.',
-        'ابق على اطلاع بأحدث تغييرات خوارزمية وسائل التواصل الاجتماعي وكيفية تكييف استراتيجية المحتوى وفقاً لذلك.'
-      ),
-      image: 'https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?w=800&q=80',
-      category: t('Marketing', 'التسويق'),
-      categoryId: 'marketing',
-      date: t('Apr 1, 2026', '1 أبريل 2026'),
-      readTime: t('5 min read', '5 دقائق'),
-      slug: 'social-media-algorithms-2026',
-    },
-    {
-      title: t('Building a Personal Brand Through Podcasting', 'بناء علامة تجارية شخصية من خلال البودكاست'),
-      excerpt: t(
-        'Discover how podcasting can help you establish yourself as an expert and build a loyal audience.',
-        'اكتشف كيف يمكن أن يساعدك البودكاست في تأسيس نفسك كخبير وبناء جمهور مخلص.'
-      ),
-      image: 'https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=800&q=80',
-      category: t('Podcast', 'بودكاست'),
-      categoryId: 'podcast',
-      date: t('Mar 28, 2026', '28 مارس 2026'),
-      readTime: t('6 min read', '6 دقائق'),
-      slug: 'personal-brand-podcasting',
-    },
-    {
-      title: t('5 Ways to Monetize Your Educational Content', '5 طرق لتحقيق الدخل من محتواك التعليمي'),
-      excerpt: t(
-        'Learn practical strategies for teachers to generate income from their educational content online.',
-        'تعلم استراتيجيات عملية للمعلمين لتحقيق دخل من محتواهم التعليمي عبر الإنترنت.'
-      ),
-      image: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800&q=80',
-      category: t('Education', 'التعليم'),
-      categoryId: 'education',
-      date: t('Mar 25, 2026', '25 مارس 2026'),
-      readTime: t('7 min read', '7 دقائق'),
-      slug: 'monetize-educational-content',
-    },
-    {
-      title: t('Video Marketing: The Ultimate Business Growth Tool', 'التسويق بالفيديو: أداة النمو النهائية للأعمال'),
-      excerpt: t(
-        'Why video marketing is essential for business growth and how to create compelling video content.',
-        'لماذا يعد التسويق بالفيديو ضرورياً لنمو الأعمال وكيفية إنشاء محتوى فيديو مقنع.'
-      ),
-      image: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&q=80',
-      category: t('Business', 'أعمال'),
-      categoryId: 'business',
-      date: t('Mar 22, 2026', '22 مارس 2026'),
-      readTime: t('5 min read', '5 دقائق'),
-      slug: 'video-marketing-business-growth',
-    },
-    {
-      title: t('Minimalist Design Trends in 2026', 'اتجاهات التصميم البسيط في 2026'),
-      excerpt: t(
-        'Explore the rise of minimalism in modern design and how to apply these principles to your projects.',
-        'استكشف صعود البساطة في التصميم الحديث وكيفية تطبيق هذه المبادئ على مشاريعك.'
-      ),
-      image: 'https://images.unsplash.com/photo-1558655146-d09347e92766?w=800&q=80',
-      category: t('Design', 'التصميم'),
-      categoryId: 'design',
-      date: t('Mar 20, 2026', '20 مارس 2026'),
-      readTime: t('4 min read', '4 دقائق'),
-      slug: 'minimalist-design-trends-2026',
-    },
-  ];
+  // Use search results only if query is not empty, otherwise use all blog posts
+  const sourcePostsList = searchQuery.trim() ? searchResultsList : postsList;
 
+  // Map API posts to BlogCard format
+  const posts = ((sourcePostsList as Post[]) || []).map((post: Post) => ({
+    title: language === 'en' ? post.title.en : post.title.ar,
+    excerpt: language === 'en' ? post.excerpt.en : post.excerpt.ar,
+    image: post.featured_image || 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80',
+    category: post.category ? (language === 'en' ? post.category.name.en : post.category.name.ar) : 'Blog',
+    categoryId: post.category?.slug || 'all',
+    date: post.published_at ? new Date(post.published_at).toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    }) : new Date(post.created_at).toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    }),
+    readTime: t('5 min read', '5 دقائق'),
+    slug: post.slug,
+  }));
+
+  // Map featured posts
+  const featuredPosts = ((featuredPostsList as Post[]) || []).map((post: Post) => ({
+    title: language === 'en' ? post.title.en : post.title.ar,
+    excerpt: language === 'en' ? post.excerpt.en : post.excerpt.ar,
+    image: post.featured_image || 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80',
+    category: post.category ? (language === 'en' ? post.category.name.en : post.category.name.ar) : 'Blog',
+    categoryId: post.category?.slug || 'all',
+    date: post.published_at ? new Date(post.published_at).toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    }) : new Date(post.created_at).toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    }),
+    readTime: t('5 min read', '5 دقائق'),
+    slug: post.slug,
+  }));
+
+  // Filter posts by category (search is already handled by API)
   const filteredPosts = posts.filter(post => {
     const matchesCategory = activeCategory === 'all' || post.categoryId === activeCategory;
-    const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
+    return matchesCategory;
   });
 
   return (
@@ -190,6 +122,44 @@ export function Blog() {
         </div>
       </section>
 
+      {/* Featured Posts Section */}
+      {featuredPosts.length > 0 && (
+        <section className="relative py-20 lg:py-32 bg-gradient-to-b from-[#1A1333] to-background">
+          <div className="max-w-7xl mx-auto px-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-16"
+            >
+              <h2 className="font-[var(--font-display)] font-bold text-4xl lg:text-5xl mb-4">
+                {t('Editor\'s Picks', 'اختيارات المحرر')}
+              </h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                {t(
+                  'Our most curated and trending articles',
+                  'مقالاتنا المختارة والأكثر رواجاً'
+                )}
+              </p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {featuredPosts.map((post, index) => (
+                <motion.div
+                  key={post.slug}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <BlogCard {...post} />
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Categories Filter */}
       <section className="relative py-8 bg-gradient-to-b from-background to-[#1A1333] sticky top-20 z-40 border-b border-border/50 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6">
@@ -215,13 +185,24 @@ export function Blog() {
       {/* Blog Posts Grid */}
       <section className="relative py-20 lg:py-32">
         <div className="max-w-7xl mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-12"
+          >
+            <h2 className="font-[var(--font-display)] font-bold text-3xl lg:text-4xl mb-2">
+              {t('All Articles', 'جميع المقالات')}
+            </h2>
+          </motion.div>
+
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredPosts.map((post, index) => (
               <motion.div
-                key={index}
+                key={post.slug}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
+                transition={{ delay: (index % 6) * 0.1 }}
               >
                 <BlogCard {...post} />
               </motion.div>

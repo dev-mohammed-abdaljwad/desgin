@@ -4,9 +4,9 @@
  */
 
 import { useCallback } from 'react';
-import { pagesService, servicesService, postsService, productsService, projectsService, testimonialsService, whyChooseUsService, settingsService } from '../api/services/public';
+import { pagesService, servicesService, postsService, productsService, projectsService, testimonialsService, whyChooseUsService, settingsService, pricingsService } from '../api/services/public';
 import { usePaginatedApi, useApi, useLazyApi } from './useApi';
-import type { Page, Service, Post, Product, Project, Testimonial, WhyChooseUs, DesignSystemSettings } from '../types/api';
+import type { Page, Service, Post, Product, Project, Testimonial, WhyChooseUs, DesignSystemSettings, Pricing } from '../types/api';
 
 // ============= Pages Hooks =============
 
@@ -91,9 +91,11 @@ export function useFeaturedPosts() {
 }
 
 export function useSearchPosts(query: string, perPage: number = 15) {
+  // Only search if query is not empty to avoid 400 Bad Request from API
+  const trimmedQuery = query.trim();
   return useApi(
-    () => postsService.searchPosts(query, perPage),
-    [query, perPage]
+    trimmedQuery ? () => postsService.searchPosts(trimmedQuery, perPage) : async () => ({ data: [] }),
+    [trimmedQuery, perPage]
   );
 }
 
@@ -231,6 +233,38 @@ export function useSetting(key: string) {
   return useApi(
     () => settingsService.getSetting(key),
     [key]
+  );
+}
+
+// ============= Pricing Packages Hooks =============
+
+export function usePricings(page: number = 1, perPage: number = 15) {
+  return usePaginatedApi(
+    (p, pp) => pricingsService.getPricings(p, pp),
+    page,
+    perPage,
+    []
+  );
+}
+
+export function useAllPricings() {
+  return useApi(
+    () => pricingsService.getAllPricings(),
+    []
+  );
+}
+
+export function usePricing(id: number) {
+  return useApi(
+    () => pricingsService.getPricing(id),
+    [id]
+  );
+}
+
+export function useHighlightedPricings() {
+  return useApi(
+    () => pricingsService.getHighlightedPricings(),
+    []
   );
 }
 

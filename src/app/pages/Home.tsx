@@ -6,7 +6,7 @@ import { TestimonialCard } from '../components/ui/TestimonialCard';
 import { PortfolioCard } from '../components/ui/PortfolioCard';
 import { BlogCard } from '../components/ui/BlogCard';
 import { StatsCard } from '../components/ui/StatsCard';
-import { useServices, useFeaturedProjects, usePosts, usePageBySlug, useFeaturedTestimonials, useWhyChooseUs } from '../../hooks/usePublicApi';
+import { useServices, useFeaturedProjects, useFeaturedPosts, usePageBySlug, useFeaturedTestimonials, useWhyChooseUs } from '../../hooks/usePublicApi';
 import type { LucideIcon } from 'lucide-react';
 import {
   Megaphone,
@@ -78,12 +78,12 @@ export function Home() {
   const { t, dir, language } = useLanguage();
   
   // Fetch data from APIs
-  const { data: fetchedServices, loading: servicesLoading } = useServices(1, 100);
-  const { data: projects, loading: projectsLoading } = useFeaturedProjects();
-  const { data: posts, loading: postsLoading } = usePosts(1, 10);
-  const { data: testimonialsList, loading: testimonialsLoading } = useFeaturedTestimonials(6);
-  const { data: whyChooseUsList, loading: whyChooseUsLoading } = useWhyChooseUs(1, 10);
-  const { data: homepage, loading: homeLoading } = usePageBySlug('homepage');
+  const { data: fetchedServices } = useServices(1, 100);
+  const { data: projects } = useFeaturedProjects();
+  const { data: posts } = useFeaturedPosts();
+  const { data: testimonialsList } = useFeaturedTestimonials(6);
+  const { data: whyChooseUsList } = useWhyChooseUs(1, 10);
+  const { data: homepage } = usePageBySlug('homepage');
 
   // Map API services to ServiceCard props
   const services = ((fetchedServices as Service[]) || []).map((service: Service) => ({
@@ -105,17 +105,15 @@ export function Home() {
   }));
 
   // Map API posts to BlogCard props
-  const blogPosts = ((posts as Post[]) || [])
-    .filter((post: Post) => post.type === 'blog')
-    .map((post: Post) => ({
-      title: language === 'en' ? post.title.en : post.title.ar,
-      excerpt: language === 'en' ? post.excerpt.en : post.excerpt.ar,
-      image: post.featured_image || post.thumbnail || 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80',
-      category: language === 'en' ? 'Blog' : 'مدونة',
-      date: formatDate(post.published_at),
-      readTime: calculateReadTime(language === 'en' ? post.content.en : post.content.ar),
-      slug: post.slug,
-    }));
+  const blogPosts = ((posts as Post[]) || []).map((post: Post) => ({
+    title: language === 'en' ? post.title.en : post.title.ar,
+    excerpt: language === 'en' ? post.excerpt.en : post.excerpt.ar,
+    image: post.featured_image || post.thumbnail || 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80',
+    category: language === 'en' ? 'Blog' : 'مدونة',
+    date: formatDate(post.published_at),
+    readTime: calculateReadTime(language === 'en' ? post.content.en : post.content.ar),
+    slug: post.slug,
+  }));
 
   const stats = [
     {
