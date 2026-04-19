@@ -244,20 +244,43 @@ export interface UpdateProductRequest extends Partial<CreateProductRequest> {}
 
 // ============= Projects Types =============
 
+export interface ProjectTag {
+  lang: 'en' | 'ar';
+  label: string;
+}
+
+export interface ProjectMetric {
+  label: string;
+  value: string;
+}
+
 export interface Project {
   id: number;
-  title: BilingualText;
-  description: BilingualText;
-  challenge: BilingualText;
-  solution: BilingualText;
+  title: string;
+  title_en: string;
+  title_ar: string;
+  description: string;
+  description_en: string;
+  description_ar: string;
+  challenge: {
+    ar: string | null;
+    en: string | null;
+  };
+  solution: {
+    ar: string | null;
+    en: string | null;
+  };
   category: string;
-  client_name: string;
-  client_logo: string;
-  result_metrics: Record<string, any>;
-  website_url?: string;
-  video_url?: string;
+  tags: ProjectTag[];
+  thumbnail: string;
   images: string[];
+  client_name: string;
+  client_logo: string | null;
+  result_metrics: ProjectMetric[];
+  website_url: string | null;
+  video_url: string | null;
   is_published: boolean;
+  published_at: string | null;
   created_at: string;
   updated_at: string;
 }

@@ -3,10 +3,13 @@ import { useLanguage } from '../context/LanguageContext';
 import { motion } from 'motion/react';
 import { PortfolioCard } from '../components/ui/PortfolioCard';
 import { Filter } from 'lucide-react';
+import { useProjects } from '../../hooks/usePublicApi';
+import type { Project } from '../../types/api';
 
 export function Portfolio() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [activeFilter, setActiveFilter] = useState('all');
+  const { data: projectsData } = useProjects(1, 100);
 
   const filters = [
     { id: 'all', label: t('All Projects', 'جميع المشاريع') },
@@ -17,107 +20,17 @@ export function Portfolio() {
     { id: 'education', label: t('Education', 'التعليم') },
   ];
 
-  const projects = [
-    {
-      title: t('Luxury Fashion Brand Identity', 'هوية علامة أزياء فاخرة'),
-      category: 'branding',
-      categoryLabel: t('Branding', 'العلامة التجارية'),
-      description: t(
-        'Complete brand identity design for a premium fashion retail brand including logo, guidelines, and packaging.',
-        'تصميم هوية تجارية كاملة لعلامة أزياء فاخرة بما في ذلك الشعار والإرشادات والتعبئة.'
-      ),
-      image: 'https://images.unsplash.com/photo-1634942537034-2531766767d1?w=800&q=80',
-      tags: [t('Logo Design', 'تصميم الشعار'), t('Brand Guidelines', 'إرشادات العلامة'), t('Packaging', 'التعبئة')],
-    },
-    {
-      title: t('Restaurant Social Media Campaign', 'حملة سوشيال ميديا لمطعم'),
-      category: 'social',
-      categoryLabel: t('Social Media', 'السوشيال ميديا'),
-      description: t(
-        '3-month social media campaign that increased engagement by 400% and drove 200+ new customers.',
-        'حملة سوشيال ميديا لمدة 3 أشهر زادت التفاعل بنسبة 400٪ وجذبت أكثر من 200 عميل جديد.'
-      ),
-      image: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800&q=80',
-      tags: [t('Content Creation', 'إنشاء المحتوى'), t('Ads Campaign', 'حملة إعلانية'), t('Analytics', 'تحليلات')],
-    },
-    {
-      title: t('Tech Startup Corporate Video', 'فيديو مؤسسي لشركة ناشئة'),
-      category: 'video',
-      categoryLabel: t('Video Production', 'إنتاج الفيديو'),
-      description: t(
-        'High-impact corporate video showcasing company culture, values, and innovative products.',
-        'فيديو مؤسسي عالي التأثير يعرض ثقافة الشركة والقيم والمنتجات المبتكرة.'
-      ),
-      image: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=800&q=80',
-      tags: [t('Corporate Video', 'فيديو مؤسسي'), t('Storytelling', 'سرد قصصي'), t('Production', 'إنتاج')],
-    },
-    {
-      title: t('Business Podcast Series', 'سلسلة بودكاست أعمال'),
-      category: 'podcast',
-      categoryLabel: t('Podcast', 'بودكاست'),
-      description: t(
-        'Full production of 20-episode podcast series covering entrepreneurship and business growth.',
-        'إنتاج كامل لسلسلة بودكاست من 20 حلقة تغطي ريادة الأعمال ونمو الأعمال.'
-      ),
-      image: 'https://images.unsplash.com/photo-1590602847861-f357a9332bbc?w=800&q=80',
-      tags: [t('Recording', 'تسجيل'), t('Editing', 'تحرير'), t('Distribution', 'توزيع')],
-    },
-    {
-      title: t('Online Math Course Platform', 'منصة دورة رياضيات إلكترونية'),
-      category: 'education',
-      categoryLabel: t('Education', 'التعليم'),
-      description: t(
-        'Comprehensive online math course with 50+ lessons, reaching 5,000+ students in first month.',
-        'دورة رياضيات إلكترونية شاملة مع أكثر من 50 درساً، وصلت إلى أكثر من 5,000 طالب في الشهر الأول.'
-      ),
-      image: 'https://images.unsplash.com/photo-1509228627152-72ae9ae6848d?w=800&q=80',
-      tags: [t('Course Design', 'تصميم الدورة'), t('Video Lessons', 'دروس فيديو'), t('LMS', 'نظام إدارة التعلم')],
-    },
-    {
-      title: t('Real Estate Marketing Package', 'حزمة تسويق عقاري'),
-      category: 'branding',
-      categoryLabel: t('Branding', 'العلامة التجارية'),
-      description: t(
-        'Complete marketing package for luxury real estate development including branding, website, and campaigns.',
-        'حزمة تسويقية كاملة لتطوير عقاري فاخر بما في ذلك العلامة التجارية والموقع والحملات.'
-      ),
-      image: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&q=80',
-      tags: [t('Branding', 'العلامة التجارية'), t('Website', 'موقع'), t('Marketing', 'تسويق')],
-    },
-    {
-      title: t('Fitness Influencer Content', 'محتوى مؤثر رياضي'),
-      category: 'social',
-      categoryLabel: t('Social Media', 'السوشيال ميديا'),
-      description: t(
-        'Monthly content creation and management for fitness influencer with 100K+ followers.',
-        'إنشاء وإدارة محتوى شهري لمؤثر رياضي بأكثر من 100 ألف متابع.'
-      ),
-      image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80',
-      tags: [t('Influencer', 'مؤثر'), t('Content', 'محتوى'), t('Growth', 'نمو')],
-    },
-    {
-      title: t('Product Launch Video Campaign', 'حملة فيديو إطلاق منتج'),
-      category: 'video',
-      categoryLabel: t('Video Production', 'إنتاج الفيديو'),
-      description: t(
-        'Multi-platform video campaign for new product launch, generating 2M+ views across platforms.',
-        'حملة فيديو متعددة المنصات لإطلاق منتج جديد، حققت أكثر من 2 مليون مشاهدة عبر المنصات.'
-      ),
-      image: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&q=80',
-      tags: [t('Product Launch', 'إطلاق منتج'), t('Ads', 'إعلانات'), t('Viral Marketing', 'تسويق فيروسي')],
-    },
-    {
-      title: t('Educational Science Series', 'سلسلة علوم تعليمية'),
-      category: 'education',
-      categoryLabel: t('Education', 'التعليم'),
-      description: t(
-        'Engaging science education series for high school students with interactive experiments.',
-        'سلسلة تعليم علوم جذابة لطلاب المرحلة الثانوية مع تجارب تفاعلية.'
-      ),
-      image: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=800&q=80',
-      tags: [t('Science', 'علوم'), t('Education', 'تعليم'), t('Interactive', 'تفاعلي')],
-    },
-  ];
+  // Transform API projects to component format
+  const projects = ((projectsData as Project[]) || []).map((project: Project) => ({
+    title: language === 'en' ? project.title_en : project.title_ar,
+    category: project.category,
+    categoryLabel: filters.find(f => f.id === project.category)?.label || project.category,
+    description: language === 'en' ? project.description_en : project.description_ar,
+    image: project.thumbnail,
+    tags: project.tags
+      .filter((tag) => tag.lang === language)
+      .map((tag) => tag.label),
+  }));
 
   const filteredProjects = activeFilter === 'all'
     ? projects
