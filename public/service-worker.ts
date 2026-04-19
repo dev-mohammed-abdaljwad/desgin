@@ -1,6 +1,7 @@
 /// <reference lib="webworker" />
 
-declare const self: ServiceWorkerGlobalScope;
+// Proper typing for service worker global scope
+const sw = globalThis as any as ServiceWorkerGlobalScope;
 
 // Cache version
 const CACHE_NAME = 'eduplatform-v1';
@@ -12,20 +13,21 @@ const STATIC_ASSETS = [
 ];
 
 // Install event - cache static assets
-self.addEventListener('install', (event) => {
+sw.addEventListener('install', (event: any) => {
   console.log('[Service Worker] Installing...');
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       console.log('[Service Worker] Caching static assets');
       return cache.addAll(STATIC_ASSETS).then(() => {
-        self.skipWaiting();
+        sw.skipWaiting();
+        return undefined;
       });
     })
   );
 });
 
 // Activate event - clean up old caches
-self.addEventListener('activate', (event) => {
+sw.addEventListener('activate', (event: any) => {
   console.log('[Service Worker] Activating...');
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -40,13 +42,13 @@ self.addEventListener('activate', (event) => {
           })
       );
     }).then(() => {
-      self.clients.claim();
+      return sw.clients.claim();
     })
   );
 });
 
 // Fetch event - implement caching strategies
-self.addEventListener('fetch', (event) => {
+sw.addEventListener('fetch', (event: any) => {
   const { request } = event;
   const url = new URL(request.url);
 
@@ -62,8 +64,9 @@ self.addEventListener('fetch', (event) => {
         .then((response) => {
           // Cache successful API responses
           if (response.ok) {
-            const cache = caches.open(RUNTIME_CACHE);
-            cache.then((c) => c.put(request, response.clone()));
+            caches.open(RUNTIME_CACHE).then((c) => {
+              c.put(request, response.clone());
+            });
           }
           return response;
         })
@@ -88,14 +91,20 @@ self.addEventListener('fetch', (event) => {
       fetch(request)
         .then((response) => {
           if (response.ok) {
-            const cache = caches.open(CACHE_NAME);
-            cache.then((c) => c.put(request, response.clone()));
+            caches.open(CACHE_NAME).then((c) => {
+              c.put(request, response.clone());
+            });
           }
           return response;
         })
         .catch(() => {
           return caches.match(request).then((response) => {
-            return response || caches.match('/index.html');
+            if (response) {
+              return response;
+            }
+            return caches.match('/index.html').then((indexResponse) => {
+              return indexResponse || new Response('Offline', { status: 503 });
+            });
           });
         })
     );
@@ -113,8 +122,9 @@ self.addEventListener('fetch', (event) => {
         .then((response) => {
           // Cache successful responses
           if (response.ok) {
-            const cache = caches.open(RUNTIME_CACHE);
-            cache.then((c) => c.put(request, response.clone()));
+            caches.open(RUNTIME_CACHE).then((c) => {
+              c.put(request, response.clone());
+            });
           }
           return response;
         })
@@ -128,23 +138,23 @@ self.addEventListener('fetch', (event) => {
 });
 
 // Handle messages from the client
-self.addEventListener('message', (event) => {
+sw.addEventListener('message', (event: any) => {
   console.log('[Service Worker] Message received:', event.data);
 
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
+  if (event.data?.type === 'SKIP_WAITING') {
+    sw.skipWaiting();
   }
 
-  if (event.data && event.data.type === 'CLEAR_CACHE') {
+  if (event.data?.type === 'CLEAR_CACHE') {
     caches.delete(RUNTIME_CACHE).then(() => {
       console.log('[Service Worker] Runtime cache cleared');
     });
   }
 
-  if (event.data && event.data.type === 'GET_CACHE_SIZE') {
+  if (event.data?.type === 'GET_CACHE_SIZE') {
     caches.open(RUNTIME_CACHE).then((cache) => {
       cache.keys().then((keys) => {
-        event.ports[0].postMessage({
+        event.ports?.[0]?.postMessage({
           type: 'CACHE_SIZE',
           size: keys.length,
         });
@@ -154,7 +164,7 @@ self.addEventListener('message', (event) => {
 });
 
 // Background sync for offline actions (optional)
-self.addEventListener('sync', (event) => {
+sw.addEventListener('sync', (event: any) => {
   if (event.tag === 'sync-forms') {
     event.waitUntil(
       // Handle offline form submissions here
@@ -162,5 +172,3 @@ self.addEventListener('sync', (event) => {
     );
   }
 });
-
-export {};
