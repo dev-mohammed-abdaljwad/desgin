@@ -1,10 +1,11 @@
 /**
  * PWA Install Prompt Component
- * Shows install prompts for different platforms
+ * Shows install prompts for different platforms using toast notifications
  */
 
 import { useState, useEffect } from 'react';
-import { X, Download, Share2 } from 'lucide-react';
+import { Download, Share2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -62,10 +63,16 @@ export function PWAInstallPrompt() {
       
       if (outcome === 'accepted') {
         setDeferredPrompt(null);
+        toast.success('App installed successfully!', {
+          description: 'You can now access the app from your home screen.',
+        });
       }
       setShowPrompt(false);
     } catch (error) {
       console.error('[PWA] Installation failed:', error);
+      toast.error('Installation failed', {
+        description: 'Please try again',
+      });
     }
   };
 
@@ -73,71 +80,35 @@ export function PWAInstallPrompt() {
     setShowPrompt(false);
   };
 
-  // iOS Installation Instructions
-  if (isIOS && !isInstalled && showPrompt) {
-    return (
-      <div className="fixed bottom-4 right-4 bg-white rounded-lg shadow-lg p-4 max-w-xs z-50 border border-gray-200">
-        <div className="flex items-start justify-between mb-3">
-          <h3 className="font-semibold text-gray-900">Install App</h3>
-          <button
-            onClick={handleDismiss}
-            className="text-gray-500 hover:text-gray-700"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-        <p className="text-sm text-gray-600 mb-4">
-          Tap <Share2 className="w-4 h-4 inline" /> then "Add to Home Screen"
-        </p>
-        <button
-          onClick={handleDismiss}
-          className="w-full px-4 py-2 bg-gray-200 text-gray-900 rounded hover:bg-gray-300 transition-colors text-sm font-medium"
-        >
-          Got it
-        </button>
-      </div>
-    );
-  }
+  // Show toast notification for iOS
+  useEffect(() => {
+    if (isIOS && !isInstalled && showPrompt) {
+      toast.info('Install App', {
+        description: 'Tap the Share button, then select "Add to Home Screen"',
+        duration: Infinity,
+        action: {
+          label: <Share2 className="w-4 h-4" />,
+          onClick: () => {},
+        },
+      });
+      setShowPrompt(false);
+    }
+  }, [isIOS, isInstalled, showPrompt]);
 
-  // Android/Desktop Installation Prompt
-  if (deferredPrompt && showPrompt && !isInstalled && !isIOS) {
-    return (
-      <div className="fixed bottom-4 right-4 bg-white rounded-lg shadow-lg p-4 max-w-xs z-50 border border-gray-200">
-        <div className="flex items-start justify-between mb-3">
-          <h3 className="font-semibold text-gray-900">Install App</h3>
-          <button
-            onClick={handleDismiss}
-            className="text-gray-500 hover:text-gray-700"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-        <p className="text-sm text-gray-600 mb-4">
-          Install this app to your device for quick access and offline use.
-        </p>
-        <div className="flex gap-2">
-          <button
-            onClick={handleDismiss}
-            className="flex-1 px-4 py-2 bg-gray-200 text-gray-900 rounded hover:bg-gray-300 transition-colors text-sm font-medium"
-          >
-            Later
-          </button>
-          <button
-            onClick={handleInstall}
-            className="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm font-medium flex items-center justify-center gap-2"
-          >
-            <Download className="w-4 h-4" />
-            Install
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // Success message
-  if (isInstalled && !showPrompt) {
-    return null; // Don't show if already installed
-  }
+  // Show toast notification for Android/Desktop
+  useEffect(() => {
+    if (deferredPrompt && showPrompt && !isInstalled && !isIOS) {
+      toast({
+        description: 'Install this app to your device for quick access and offline use.',
+        action: {
+          label: 'Install',
+          onClick: handleInstall,
+        },
+        duration: Infinity,
+      });
+      setShowPrompt(false);
+    }
+  }, [deferredPrompt, showPrompt, isInstalled, isIOS]);
 
   return null;
 }

@@ -4,6 +4,7 @@ import { Footer } from "./Footer";
 import { FloatingWhatsApp } from "../ui/FloatingWhatsApp";
 import { MobileNav } from "./MobileNav";
 import { AdminAccessButton } from "./AdminAccessButton";
+import { Toaster } from "../ui/sonner";
 
 export function RootLayout() {
   return (
@@ -16,6 +17,7 @@ export function RootLayout() {
       <FloatingWhatsApp />
       <MobileNav />
       <AdminAccessButton />
+      <Toaster position="bottom-center" />
     </div>
   );
 }
