@@ -1,11 +1,26 @@
 {
-  "name": "@figma/my-make-file",
-  "private": true,
-  "version": "0.0.1",
+  "name": "educational-learning-platform",
+  "private": false,
+  "version": "1.0.0",
   "type": "module",
+  "description": "Comprehensive educational platform for students and teachers with interactive courses, features, and resources",
+  "homepage": "https://yourdomain.com",
+  "keywords": [
+    "education",
+    "learning",
+    "platform",
+    "elearning",
+    "courses",
+    "interactive",
+    "pwa"
+  ],
+  "author": "Your Organization",
+  "license": "MIT",
   "scripts": {
+    "dev": "vite",
     "build": "vite build",
-    "dev": "vite"
+    "build:prod": "NODE_ENV=production vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",

@@ -35,6 +35,18 @@ export default defineConfig({
   assetsInclude: ['**/*.svg', '**/*.csv'],
 
   build: {
+    outDir: 'dist',
+    sourcemap: false,
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        dead_code: true,
+      },
+      output: {
+        comments: false,
+      },
+    },
     rollupOptions: {
       input: {
         main: path.resolve(__dirname, 'index.html'),
@@ -46,8 +58,17 @@ export default defineConfig({
             ? 'service-worker.js'
             : 'assets/[name].[hash].js'
         },
+        chunkFileNames: 'assets/[name].[hash].js',
+        assetFileNames: 'assets/[name].[hash][extname]',
       },
     },
+    chunkSizeWarningLimit: 1024,
+    reportCompressedSize: true,
+  },
+
+  server: {
+    port: 3000,
+    open: false,
   },
 })
 

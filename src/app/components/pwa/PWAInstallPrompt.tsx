@@ -42,7 +42,7 @@ export function PWAInstallPrompt() {
     const handleAppInstalled = () => {
       setIsInstalled(true);
       setShowPrompt(false);
-      console.log('[PWA] App installed successfully!');
+      if (import.meta.env.DEV) console.log('[PWA] App installed successfully!');
     };
 
     globalThis.addEventListener('appinstalled', handleAppInstalled);
@@ -59,7 +59,7 @@ export function PWAInstallPrompt() {
     try {
       await deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
-      console.log(`[PWA] User response: ${outcome}`);
+      if (import.meta.env.DEV) console.log(`[PWA] User response: ${outcome}`);
       
       if (outcome === 'accepted') {
         setDeferredPrompt(null);
@@ -69,7 +69,7 @@ export function PWAInstallPrompt() {
       }
       setShowPrompt(false);
     } catch (error) {
-      console.error('[PWA] Installation failed:', error);
+      if (import.meta.env.DEV) console.error('[PWA] Installation failed:', error);
       toast.error('Installation failed', {
         description: 'Please try again',
       });

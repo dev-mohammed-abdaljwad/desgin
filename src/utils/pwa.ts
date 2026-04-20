@@ -19,7 +19,7 @@ export async function registerServiceWorker(options: ServiceWorkerOptions = {}) 
 
   // Check if service workers are supported
   if (!('serviceWorker' in navigator)) {
-    console.warn('[PWA] Service Workers are not supported in this browser');
+    if (import.meta.env.DEV) console.warn('[PWA] Service Workers are not supported in this browser');
     return;
   }
 
@@ -29,12 +29,12 @@ export async function registerServiceWorker(options: ServiceWorkerOptions = {}) 
       scope: '/',
     });
 
-    console.log('[PWA] Service Worker registered successfully');
+    if (import.meta.env.DEV) console.log('[PWA] Service Worker registered successfully');
 
     // Check for updates periodically
     const checkForUpdates = () => {
       registration?.update().catch((err) => {
-        console.error('[PWA] Error checking for SW updates:', err);
+        if (import.meta.env.DEV) console.error('[PWA] Error checking for SW updates:', err);
       });
     };
 
@@ -52,7 +52,7 @@ export async function registerServiceWorker(options: ServiceWorkerOptions = {}) 
             navigator.serviceWorker.controller
           ) {
             // New service worker is ready
-            console.log('[PWA] New Service Worker is ready for activation');
+            if (import.meta.env.DEV) console.log('[PWA] New Service Worker is ready for activation');
             onUpdate?.();
             promptUserToRefresh();
           }
@@ -65,7 +65,7 @@ export async function registerServiceWorker(options: ServiceWorkerOptions = {}) 
       onSuccess?.();
     }
   } catch (error) {
-    console.error('[PWA] Service Worker registration failed:', error);
+    if (import.meta.env.DEV) console.error('[PWA] Service Worker registration failed:', error);
     const err =
       error instanceof Error
         ? error
@@ -85,11 +85,11 @@ export async function unregisterServiceWorker() {
   try {
     const success = await registration.unregister();
     if (success) {
-      console.log('[PWA] Service Worker unregistered successfully');
+      if (import.meta.env.DEV) console.log('[PWA] Service Worker unregistered successfully');
       registration = null;
     }
   } catch (error) {
-    console.error('[PWA] Error unregistering Service Worker:', error);
+    if (import.meta.env.DEV) console.error('[PWA] Error unregistering Service Worker:', error);
   }
 }
 
@@ -108,7 +108,7 @@ export function isPWAInstalled(): boolean {
  */
 export async function requestNotificationPermission(): Promise<boolean> {
   if (!('Notification' in globalThis)) {
-    console.warn('[PWA] Notifications are not supported');
+    if (import.meta.env.DEV) console.warn('[PWA] Notifications are not supported');
     return false;
   }
 
@@ -129,7 +129,7 @@ export async function requestNotificationPermission(): Promise<boolean> {
  */
 export async function sendNotification(title: string, options?: NotificationOptions) {
   if (!('serviceWorker' in navigator) || !registration) {
-    console.warn('[PWA] Cannot send notification - Service Worker not available');
+    if (import.meta.env.DEV) console.warn('[PWA] Cannot send notification - Service Worker not available');
     return;
   }
 
@@ -141,7 +141,7 @@ export async function sendNotification(title: string, options?: NotificationOpti
       });
     }
   } catch (error) {
-    console.error('[PWA] Error sending notification:', error);
+    if (import.meta.env.DEV) console.error('[PWA] Error sending notification:', error);
   }
 }
 
@@ -154,9 +154,9 @@ export async function clearCache() {
     await Promise.all(
       cacheNames.map((cacheName) => caches.delete(cacheName))
     );
-    console.log('[PWA] Cache cleared successfully');
+    if (import.meta.env.DEV) console.log('[PWA] Cache cleared successfully');
   } catch (error) {
-    console.error('[PWA] Error clearing cache:', error);
+    if (import.meta.env.DEV) console.error('[PWA] Error clearing cache:', error);
   }
 }
 
@@ -176,7 +176,7 @@ export async function getCacheSize(): Promise<number> {
 
     return totalSize;
   } catch (error) {
-    console.error('[PWA] Error getting cache size:', error);
+    if (import.meta.env.DEV) console.error('[PWA] Error getting cache size:', error);
     return 0;
   }
 }
@@ -249,9 +249,9 @@ export async function updateServiceWorker() {
   if (registration) {
     try {
       await registration.update();
-      console.log('[PWA] Checked for Service Worker updates');
+      if (import.meta.env.DEV) console.log('[PWA] Checked for Service Worker updates');
     } catch (error) {
-      console.error('[PWA] Error updating Service Worker:', error);
+      if (import.meta.env.DEV) console.error('[PWA] Error updating Service Worker:', error);
     }
   }
 }

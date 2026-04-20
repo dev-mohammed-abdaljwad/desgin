@@ -10,13 +10,13 @@
   if (import.meta.env.PROD) {
     registerServiceWorker({
       onSuccess: () => {
-        console.log('PWA ready for offline use!');
+        if (import.meta.env.DEV) console.log('PWA ready for offline use!');
       },
       onUpdate: () => {
-        console.log('New version available!');
+        if (import.meta.env.DEV) console.log('New version available!');
       },
       onError: (error) => {
-        console.error('PWA registration failed:', error);
+        if (import.meta.env.DEV) console.error('PWA registration failed:', error);
       },
     });
   }

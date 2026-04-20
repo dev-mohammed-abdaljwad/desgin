@@ -3,9 +3,11 @@
  * Centralized configuration for API endpoints and settings
  */
 
+const isDevelopment = import.meta.env.DEV;
+
 export const API_CONFIG = {
   // Base URL for API requests
-  baseUrl: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1',
+  baseUrl: import.meta.env.VITE_API_BASE_URL || (isDevelopment ? 'http://localhost:8000/api/v1' : 'https://api.yourdomain.com/api/v1'),
   
   // API version
   version: 'v1',
@@ -27,7 +29,9 @@ export const API_CONFIG = {
   
   // CORS settings
   cors: {
-    allowOrigins: ['http://localhost:3000', 'https://yourdomain.com'],
+    allowOrigins: isDevelopment 
+      ? ['http://localhost:3000', 'http://127.0.0.1:3000']
+      : [import.meta.env.VITE_APP_URL || 'https://yourdomain.com'],
     allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowHeaders: ['Content-Type', 'Authorization'],
   },
