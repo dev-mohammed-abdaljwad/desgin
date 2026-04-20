@@ -12,6 +12,11 @@ const STATIC_ASSETS = [
   '/manifest.json',
 ];
 
+// Check if request method is cacheable
+function isCacheableMethod(method: string): boolean {
+  return ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].includes(method);
+}
+
 // Install event - cache static assets
 sw.addEventListener('install', (event: any) => {
   console.log('[Service Worker] Installing...');
@@ -62,8 +67,8 @@ sw.addEventListener('fetch', (event: any) => {
     event.respondWith(
       fetch(request)
         .then((response) => {
-          // Cache successful API responses
-          if (response.ok) {
+          // Cache successful API responses only if method is cacheable
+          if (response.ok && isCacheableMethod(request.method)) {
             const responseClone = response.clone();
             caches.open(RUNTIME_CACHE).then((c) => {
               c.put(request, responseClone);
@@ -91,7 +96,7 @@ sw.addEventListener('fetch', (event: any) => {
     event.respondWith(
       fetch(request)
         .then((response) => {
-          if (response.ok) {
+          if (response.ok && isCacheableMethod(request.method)) {
             const responseClone = response.clone();
             caches.open(CACHE_NAME).then((c) => {
               c.put(request, responseClone);
@@ -122,8 +127,8 @@ sw.addEventListener('fetch', (event: any) => {
 
       return fetch(request)
         .then((response) => {
-          // Cache successful responses
-          if (response.ok) {
+          // Cache successful responses only if method is cacheable
+          if (response.ok && isCacheableMethod(request.method)) {
             const responseClone = response.clone();
             caches.open(RUNTIME_CACHE).then((c) => {
               c.put(request, responseClone);
