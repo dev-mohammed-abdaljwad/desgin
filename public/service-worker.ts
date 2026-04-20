@@ -64,8 +64,9 @@ sw.addEventListener('fetch', (event: any) => {
         .then((response) => {
           // Cache successful API responses
           if (response.ok) {
+            const responseClone = response.clone();
             caches.open(RUNTIME_CACHE).then((c) => {
-              c.put(request, response.clone());
+              c.put(request, responseClone);
             });
           }
           return response;
@@ -91,8 +92,9 @@ sw.addEventListener('fetch', (event: any) => {
       fetch(request)
         .then((response) => {
           if (response.ok) {
+            const responseClone = response.clone();
             caches.open(CACHE_NAME).then((c) => {
-              c.put(request, response.clone());
+              c.put(request, responseClone);
             });
           }
           return response;
@@ -122,8 +124,9 @@ sw.addEventListener('fetch', (event: any) => {
         .then((response) => {
           // Cache successful responses
           if (response.ok) {
+            const responseClone = response.clone();
             caches.open(RUNTIME_CACHE).then((c) => {
-              c.put(request, response.clone());
+              c.put(request, responseClone);
             });
           }
           return response;
