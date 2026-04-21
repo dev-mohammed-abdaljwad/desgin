@@ -5,6 +5,7 @@ import { FloatingWhatsApp } from "../ui/FloatingWhatsApp";
 import { MobileNav } from "./MobileNav";
 import { AdminAccessButton } from "./AdminAccessButton";
 import { Toaster } from "../ui/sonner";
+import { InstallPWA } from "../pwa/InstallPWA";
 
 export function RootLayout() {
   return (
@@ -17,6 +18,7 @@ export function RootLayout() {
       <FloatingWhatsApp />
       <MobileNav />
       <AdminAccessButton />
+      <InstallPWA />
       <Toaster position="bottom-center" />
     </div>
   );

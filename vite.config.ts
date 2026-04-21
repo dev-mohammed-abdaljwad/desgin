@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import path from 'node:path'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
+import fs from 'node:fs'
 
 
 function figmaAssetResolver() {
@@ -16,9 +17,36 @@ function figmaAssetResolver() {
   }
 }
 
+function copyPublicFiles() {
+  return {
+    name: 'copy-public-files',
+    apply: 'build',
+    writeBundle() {
+      const publicDir = path.resolve(__dirname, 'public')
+      const distDir = path.resolve(__dirname, 'dist')
+      
+      if (fs.existsSync(publicDir)) {
+        const files = fs.readdirSync(publicDir)
+        files.forEach((file) => {
+          if (file !== 'service-worker.ts' && !file.startsWith('.')) {
+            const src = path.join(publicDir, file)
+            const dest = path.join(distDir, file)
+            
+            const stat = fs.statSync(src)
+            if (stat.isFile()) {
+              fs.copyFileSync(src, dest)
+            }
+          }
+        })
+      }
+    },
+  }
+}
+
 export default defineConfig({
   plugins: [
     figmaAssetResolver(),
+    copyPublicFiles(),
     // The React and Tailwind plugins are both required for Make, even if
     // Tailwind is not being actively used – do not remove them
     react(),
